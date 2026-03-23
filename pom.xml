@@ -12,7 +12,7 @@
         <module>seckill-application</module>
         <module>seckill-domain</module>
         <module>seckill-infra</module>
-        <module>seckill-interface</module>
+        <module>seckill-interfaces</module>
         <module>seckill-nginx</module>
         <module>seckill-starter</module>
     </modules>
@@ -38,7 +38,7 @@
         <jaxb.version>2.3.0</jaxb.version>
         <activation.version>1.1.1</activation.version>
         <hibernate.version>5.2.4.Final</hibernate.version>
-        <jdbc.version>5.1.30</jdbc.version>
+        <jdbc.version>8.0.33</jdbc.version>
         <druid.version>1.2.3</druid.version>
         <junit.version>4.12</junit.version>
         <mybatisplus.version>3.5.9</mybatisplus.version>
@@ -104,6 +104,18 @@
         </dependency>
 
         <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-extension</artifactId>
+            <version>${mybatisplus.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-jsqlparser-4.9</artifactId>
+            <version>${mybatisplus.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
@@ -164,7 +176,7 @@
 
         <dependency>
             <groupId>com.alibaba</groupId>
-            <artifactId>druid</artifactId>
+            <artifactId>druid-spring-boot-starter</artifactId>
             <version>${druid.version}</version>
         </dependency>
 
@@ -177,6 +189,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+            <version>1.18.30</version>
             <optional>true</optional>
         </dependency>
     </dependencies>

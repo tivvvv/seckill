@@ -20,7 +20,7 @@
     <dependencies>
         <dependency>
             <groupId>com.tiv</groupId>
-            <artifactId>seckill-interface</artifactId>
+            <artifactId>seckill-interfaces</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
