@@ -51,4 +51,15 @@ public class ResponseUtils {
         return new Response<>(errorCodeEnum.getCode(), data);
     }
 
+    /**
+     * 失败
+     *
+     * @param code
+     * @param message
+     * @return
+     */
+    public static Response<?> error(int code, String message) {
+        return new Response<>(code, message);
+    }
+
 }
