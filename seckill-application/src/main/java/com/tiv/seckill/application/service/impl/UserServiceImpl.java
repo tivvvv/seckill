@@ -44,9 +44,15 @@ public class UserServiceImpl implements UserService {
         String key = Constants.getKey(Constants.USER_LOGIN_KEY_PREFIX, String.valueOf(user.getId()));
 
         // 4. 缓存 token
-        redisService.set(key, token);
+        redisService.set(key, user);
 
         return token;
+    }
+
+    @Override
+    public User getUserByUserId(Long userId) {
+        String key = Constants.getKey(Constants.USER_LOGIN_KEY_PREFIX, String.valueOf(userId));
+        return (User) redisService.get(key);
     }
 
 }
