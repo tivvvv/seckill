@@ -1,4 +1,4 @@
-package com.tiv.seckill.infra.util;
+package com.tiv.seckill.infra.util.shiro;
 
 import org.apache.shiro.crypto.hash.SimpleHash;
 

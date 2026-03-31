@@ -8,8 +8,8 @@ import com.tiv.seckill.domain.dto.UserLoginDTO;
 import com.tiv.seckill.domain.exception.BusinessException;
 import com.tiv.seckill.domain.model.User;
 import com.tiv.seckill.domain.repository.UserRepository;
-import com.tiv.seckill.infra.util.CommonUtil;
-import com.tiv.seckill.infra.util.JwtUtil;
+import com.tiv.seckill.infra.util.shiro.CommonUtil;
+import com.tiv.seckill.infra.util.shiro.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

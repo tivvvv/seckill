@@ -6,7 +6,7 @@ import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 
 /**
- * 用户登录DTO
+ * 用户登录 DTO
  */
 @Data
 public class UserLoginDTO implements Serializable {

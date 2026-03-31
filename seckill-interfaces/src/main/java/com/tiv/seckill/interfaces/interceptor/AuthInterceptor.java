@@ -3,7 +3,7 @@ package com.tiv.seckill.interfaces.interceptor;
 import com.tiv.seckill.domain.code.ErrorCodeEnum;
 import com.tiv.seckill.domain.constants.Constants;
 import com.tiv.seckill.domain.exception.BusinessException;
-import com.tiv.seckill.infra.util.JwtUtil;
+import com.tiv.seckill.infra.util.shiro.JwtUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
