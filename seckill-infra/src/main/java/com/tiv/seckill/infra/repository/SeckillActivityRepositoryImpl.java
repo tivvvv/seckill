@@ -7,12 +7,12 @@ import com.tiv.seckill.domain.model.SeckillActivity;
 import com.tiv.seckill.domain.repository.SeckillActivityRepository;
 import com.tiv.seckill.infra.mapper.SeckillActivityMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.List;
 
-@Service
+@Component
 public class SeckillActivityRepositoryImpl implements SeckillActivityRepository {
 
     @Autowired
@@ -28,9 +28,10 @@ public class SeckillActivityRepositoryImpl implements SeckillActivityRepository 
 
     @Override
     public int updateStatus(Long id, Integer status) {
-        SeckillActivity seckillActivity = new SeckillActivity();
-        seckillActivity.setId(id);
-        seckillActivity.setStatus(status);
+        SeckillActivity seckillActivity = SeckillActivity.builder()
+                .id(id)
+                .status(status)
+                .build();
         return seckillActivityMapper.updateById(seckillActivity);
     }
 
