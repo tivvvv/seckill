@@ -58,3 +58,7 @@ cache:
     type: guava
   distributed:
     type: redis
+
+lock:
+  distributed:
+    type: redisson
