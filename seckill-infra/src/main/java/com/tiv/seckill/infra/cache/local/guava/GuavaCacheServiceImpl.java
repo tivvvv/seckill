@@ -12,10 +12,10 @@ import org.springframework.stereotype.Service;
  * @param <V>
  */
 @Service
-@ConditionalOnProperty(name = "local.cache.type", havingValue = "guava")
-public class GuavaLocalCacheServiceImpl<K, V> implements LocalCacheService<K, V> {
+@ConditionalOnProperty(name = "cache.local.type", havingValue = "guava")
+public class GuavaCacheServiceImpl<K, V> implements LocalCacheService<K, V> {
 
-    private final Cache<K, V> cache = GuavaLocalCacheFactory.getLocalCache();
+    private final Cache<K, V> cache = GuavaCacheFactory.getLocalCache();
 
     @Override
     public void put(K key, V value) {

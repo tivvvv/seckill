@@ -5,7 +5,7 @@ import com.google.common.cache.CacheBuilder;
 
 import java.util.concurrent.TimeUnit;
 
-public class GuavaLocalCacheFactory {
+public class GuavaCacheFactory {
 
     public static <K, V> Cache<K, V> getLocalCache() {
         return CacheBuilder.newBuilder()
