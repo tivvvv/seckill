@@ -48,6 +48,11 @@ public class SeckillActivityDTO implements Serializable {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date endTime;
 
+    /**
+     * 版本号
+     */
+    private Long version;
+
     @Serial
     private static final long serialVersionUID = 1L;
 

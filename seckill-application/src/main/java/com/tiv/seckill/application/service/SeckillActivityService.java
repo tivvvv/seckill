@@ -20,4 +20,6 @@ public interface SeckillActivityService {
 
     List<SeckillActivityDTO> getSeckillActivityList(Integer status, Long version);
 
+    SeckillActivityDTO getSeckillActivity(Long id, Long version);
+
 }

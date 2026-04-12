@@ -1,6 +1,8 @@
 package com.tiv.seckill.application.service.impl;
 
+import com.tiv.seckill.application.builder.SeckillActivityBuilder;
 import com.tiv.seckill.application.cache.model.SeckillBusinessCache;
+import com.tiv.seckill.application.cache.service.activity.SeckillActivityCacheService;
 import com.tiv.seckill.application.cache.service.activity.SeckillActivityListCacheService;
 import com.tiv.seckill.application.service.SeckillActivityService;
 import com.tiv.seckill.domain.code.ErrorCodeEnum;
@@ -25,6 +27,9 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
 
     @Autowired
     private SeckillActivityListCacheService seckillActivityListCacheService;
+
+    @Autowired
+    private SeckillActivityCacheService seckillActivityCacheService;
 
     @Override
     public void saveSeckillActivity(SeckillActivityDTO seckillActivityDTO) {
@@ -72,8 +77,26 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
                 .map(seckillActivity -> {
                     SeckillActivityDTO seckillActivityDTO = new SeckillActivityDTO();
                     BeanUtil.copyProperties(seckillActivity, seckillActivityDTO);
+                    seckillActivityDTO.setVersion(seckillActivitiesCache.getVersion());
                     return seckillActivityDTO;
                 }).toList();
+    }
+
+    @Override
+    public SeckillActivityDTO getSeckillActivity(Long id, Long version) {
+        if (id == null) {
+            throw new BusinessException(ErrorCodeEnum.PARAMS_ERROR);
+        }
+        SeckillBusinessCache<SeckillActivity> seckillActivityCache = seckillActivityCacheService.getCachedActivity(id, version);
+        if (!seckillActivityCache.isExist()) {
+            throw new BusinessException(ErrorCodeEnum.PARAMS_ERROR, "活动不存在");
+        }
+        if (seckillActivityCache.isRetryLater()) {
+            throw new BusinessException(ErrorCodeEnum.RETRY_LATER);
+        }
+        SeckillActivityDTO seckillActivityDTO = SeckillActivityBuilder.toSeckillActivityDTO(seckillActivityCache.getData());
+        seckillActivityDTO.setVersion(seckillActivityCache.getVersion());
+        return seckillActivityDTO;
     }
 
 }
