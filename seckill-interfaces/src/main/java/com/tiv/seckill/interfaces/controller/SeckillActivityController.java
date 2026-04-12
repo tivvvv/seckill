@@ -50,7 +50,7 @@ public class SeckillActivityController {
 
     @GetMapping("/list/dto")
     public Response<List<SeckillActivityDTO>> getSeckillActivityList(@RequestParam(value = "status", required = true) Integer status,
-                                                                     @RequestParam(value = "version", required = true) Long version) {
+                                                                     @RequestParam(value = "version", required = false) Long version) {
         return ResponseUtils.success(seckillActivityService.getSeckillActivityList(status, version));
     }
 
