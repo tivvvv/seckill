@@ -12,14 +12,14 @@ public interface SeckillActivityService {
 
     int updateStatus(Long id, Integer status);
 
-    List<SeckillActivity> getSeckillActivityList(Integer status);
+    List<SeckillActivity> getSeckillActivityDTOList(Integer status);
 
     List<SeckillActivity> getSeckillActivityListByNow(Date currentTime, Integer status);
 
     SeckillActivity getSeckillActivityById(Long id);
 
-    List<SeckillActivityDTO> getSeckillActivityList(Integer status, Long version);
+    List<SeckillActivityDTO> getSeckillActivityDTOList(Integer status, Long version);
 
-    SeckillActivityDTO getSeckillActivity(Long id, Long version);
+    SeckillActivityDTO getSeckillActivityDTO(Long id, Long version);
 
 }

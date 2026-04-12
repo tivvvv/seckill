@@ -8,8 +8,8 @@ import java.util.List;
 
 public interface SeckillActivityListCacheService extends SeckillCacheService {
 
-    SeckillBusinessCache<List<SeckillActivity>> getCachedActivities(Integer status, Long version);
+    SeckillBusinessCache<List<SeckillActivity>> getCachedActivityList(Integer status, Long version);
 
-    SeckillBusinessCache<List<SeckillActivity>> tryUpdateSeckillActivitiesCacheByLock(Integer status);
+    SeckillBusinessCache<List<SeckillActivity>> tryUpdateSeckillActivityListCacheByLock(Integer status);
 
 }

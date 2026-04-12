@@ -32,8 +32,8 @@ public class SeckillActivityController {
     }
 
     @GetMapping("/list")
-    public Response<List<SeckillActivity>> getSeckillActivityList(@RequestParam(value = "status", required = false) Integer status) {
-        return ResponseUtils.success(seckillActivityService.getSeckillActivityList(status));
+    public Response<List<SeckillActivity>> getSeckillActivityDTOList(@RequestParam(value = "status", required = false) Integer status) {
+        return ResponseUtils.success(seckillActivityService.getSeckillActivityDTOList(status));
     }
 
     @GetMapping("/list/now")
@@ -49,15 +49,15 @@ public class SeckillActivityController {
     }
 
     @GetMapping("/list/dto")
-    public Response<List<SeckillActivityDTO>> getSeckillActivityList(@RequestParam(value = "status", required = true) Integer status,
-                                                                     @RequestParam(value = "version", required = false) Long version) {
-        return ResponseUtils.success(seckillActivityService.getSeckillActivityList(status, version));
+    public Response<List<SeckillActivityDTO>> getSeckillActivityDTOList(@RequestParam(value = "status", required = true) Integer status,
+                                                                        @RequestParam(value = "version", required = false) Long version) {
+        return ResponseUtils.success(seckillActivityService.getSeckillActivityDTOList(status, version));
     }
 
     @GetMapping("/dto")
-    public Response<SeckillActivityDTO> getSeckillActivity(@RequestParam(value = "id", required = true) Long id,
-                                                           @RequestParam(value = "version", required = false) Long version) {
-        return ResponseUtils.success(seckillActivityService.getSeckillActivity(id, version));
+    public Response<SeckillActivityDTO> getSeckillActivityDTO(@RequestParam(value = "id", required = true) Long id,
+                                                              @RequestParam(value = "version", required = false) Long version) {
+        return ResponseUtils.success(seckillActivityService.getSeckillActivityDTO(id, version));
     }
 
 }

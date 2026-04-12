@@ -31,7 +31,7 @@ public class Constants {
     /**
      * 秒杀活动列表缓存key
      */
-    public static final String SECKILL_ACTIVITIES_CACHE_KEY = "SECKILL_ACTIVITIES_CACHE_KEY";
+    public static final String SECKILL_ACTIVITY_LIST_CACHE_KEY = "SECKILL_ACTIVITY_LIST_CACHE_KEY";
 
     /**
      * 秒杀活动缓存key

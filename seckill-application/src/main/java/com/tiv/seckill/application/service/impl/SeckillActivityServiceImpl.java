@@ -50,7 +50,7 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
     }
 
     @Override
-    public List<SeckillActivity> getSeckillActivityList(Integer status) {
+    public List<SeckillActivity> getSeckillActivityDTOList(Integer status) {
         return seckillActivityRepository.getSeckillActivityList(status);
     }
 
@@ -65,25 +65,25 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
     }
 
     @Override
-    public List<SeckillActivityDTO> getSeckillActivityList(Integer status, Long version) {
-        SeckillBusinessCache<List<SeckillActivity>> seckillActivitiesCache = seckillActivityListCacheService.getCachedActivities(status, version);
-        if (!seckillActivitiesCache.isExist()) {
+    public List<SeckillActivityDTO> getSeckillActivityDTOList(Integer status, Long version) {
+        SeckillBusinessCache<List<SeckillActivity>> seckillActivityListCache = seckillActivityListCacheService.getCachedActivityList(status, version);
+        if (!seckillActivityListCache.isExist()) {
             throw new BusinessException(ErrorCodeEnum.PARAMS_ERROR, "活动不存在");
         }
-        if (seckillActivitiesCache.isRetryLater()) {
+        if (seckillActivityListCache.isRetryLater()) {
             throw new BusinessException(ErrorCodeEnum.RETRY_LATER);
         }
-        return seckillActivitiesCache.getData().stream()
+        return seckillActivityListCache.getData().stream()
                 .map(seckillActivity -> {
                     SeckillActivityDTO seckillActivityDTO = new SeckillActivityDTO();
                     BeanUtil.copyProperties(seckillActivity, seckillActivityDTO);
-                    seckillActivityDTO.setVersion(seckillActivitiesCache.getVersion());
+                    seckillActivityDTO.setVersion(seckillActivityListCache.getVersion());
                     return seckillActivityDTO;
                 }).toList();
     }
 
     @Override
-    public SeckillActivityDTO getSeckillActivity(Long id, Long version) {
+    public SeckillActivityDTO getSeckillActivityDTO(Long id, Long version) {
         if (id == null) {
             throw new BusinessException(ErrorCodeEnum.PARAMS_ERROR);
         }

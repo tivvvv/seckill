@@ -42,7 +42,7 @@ public class SeckillActivityListCacheServiceImpl implements SeckillActivityListC
     /**
      * 秒杀活动列表更新缓存分布式锁key
      */
-    private static final String SECKILL_ACTIVITIES_UPDATE_CACHE_LOCK_KEY = "SECKILL_ACTIVITIES_UPDATE_CACHE_LOCK_KEY_";
+    private static final String SECKILL_ACTIVITY_LIST_UPDATE_CACHE_LOCK_KEY = "SECKILL_ACTIVITY_LIST_UPDATE_CACHE_LOCK_KEY";
 
     /**
      * 本地缓存更新锁
@@ -50,16 +50,16 @@ public class SeckillActivityListCacheServiceImpl implements SeckillActivityListC
     private final Lock localCacheUpdateLock = new ReentrantLock();
 
     @Override
-    public SeckillBusinessCache<List<SeckillActivity>> getCachedActivities(Integer status, Long version) {
+    public SeckillBusinessCache<List<SeckillActivity>> getCachedActivityList(Integer status, Long version) {
         // 获取本地缓存
-        SeckillBusinessCache<List<SeckillActivity>> seckillActivitiesCache = localCacheService.getIfPresent(status.longValue());
-        if (seckillActivitiesCache == null) {
+        SeckillBusinessCache<List<SeckillActivity>> seckillActivityListCache = localCacheService.getIfPresent(status.longValue());
+        if (seckillActivityListCache == null) {
             // 本地缓存不存在,获取分布式缓存
             return getDistributedCache(status);
         }
-        if (version == null || version.compareTo(seckillActivitiesCache.getVersion()) <= 0) {
-            log.info("seckillActivitiesCache|命中本地缓存|{}", status);
-            return seckillActivitiesCache;
+        if (version == null || version.compareTo(seckillActivityListCache.getVersion()) <= 0) {
+            log.info("seckillActivityListCache|命中本地缓存|{}", status);
+            return seckillActivityListCache;
         } else {
             // 本地缓存过期了,获取分布式缓存
             return getDistributedCache(status);
@@ -68,28 +68,28 @@ public class SeckillActivityListCacheServiceImpl implements SeckillActivityListC
 
     private SeckillBusinessCache<List<SeckillActivity>> getDistributedCache(Integer status) {
         String cacheKey = buildCacheKey(status);
-        SeckillBusinessCache<List<SeckillActivity>> seckillActivitiesCache = SeckillActivityBuilder.getSeckillBusinessCacheList(distributedCacheService.getObject(cacheKey), SeckillActivity.class);
-        if (seckillActivitiesCache == null) {
+        SeckillBusinessCache<List<SeckillActivity>> seckillActivityListCache = SeckillActivityBuilder.getSeckillBusinessCacheList(distributedCacheService.getObject(cacheKey), SeckillActivity.class);
+        if (seckillActivityListCache == null) {
             // 分布式缓存不存在,尝试更新分布式缓存
-            seckillActivitiesCache = tryUpdateSeckillActivitiesCacheByLock(status);
+            seckillActivityListCache = tryUpdateSeckillActivityListCacheByLock(status);
         }
-        if (seckillActivitiesCache != null && !seckillActivitiesCache.isRetryLater()) {
+        if (seckillActivityListCache != null && !seckillActivityListCache.isRetryLater()) {
             // 获取分布式缓存后,尝试加锁更新本地缓存
             if (localCacheUpdateLock.tryLock()) {
                 try {
-                    localCacheService.put(status.longValue(), seckillActivitiesCache);
-                    log.info("seckillActivitiesCache|更新本地缓存成功|{}", status);
+                    localCacheService.put(status.longValue(), seckillActivityListCache);
+                    log.info("seckillActivityListCache|更新本地缓存成功|{}", status);
                 } finally {
                     localCacheUpdateLock.unlock();
                 }
             }
         }
-        return seckillActivitiesCache;
+        return seckillActivityListCache;
     }
 
     @Override
-    public SeckillBusinessCache<List<SeckillActivity>> tryUpdateSeckillActivitiesCacheByLock(Integer status) {
-        DistributedLock distributedLock = distributedLockFactory.getDistributedLock(SECKILL_ACTIVITIES_UPDATE_CACHE_LOCK_KEY.concat(String.valueOf(status)));
+    public SeckillBusinessCache<List<SeckillActivity>> tryUpdateSeckillActivityListCacheByLock(Integer status) {
+        DistributedLock distributedLock = distributedLockFactory.getDistributedLock(SECKILL_ACTIVITY_LIST_UPDATE_CACHE_LOCK_KEY.concat(String.valueOf(status)));
         try {
             // 尝试获取分布式锁
             if (!distributedLock.tryLock(1L, 5L, TimeUnit.SECONDS)) {
@@ -98,19 +98,19 @@ public class SeckillActivityListCacheServiceImpl implements SeckillActivityListC
             }
             // 获取分布式锁成功,查询数据库
             List<SeckillActivity> seckillActivityList = seckillActivityRepository.getSeckillActivityList(status);
-            SeckillBusinessCache<List<SeckillActivity>> seckillActivitiesCache;
+            SeckillBusinessCache<List<SeckillActivity>> seckillActivityListCache;
             if (CollectionUtils.isEmpty(seckillActivityList)) {
-                seckillActivitiesCache = new SeckillBusinessCache<List<SeckillActivity>>().notExist();
+                seckillActivityListCache = new SeckillBusinessCache<List<SeckillActivity>>().notExist();
             } else {
-                seckillActivitiesCache = new SeckillBusinessCache<List<SeckillActivity>>().with(seckillActivityList)
+                seckillActivityListCache = new SeckillBusinessCache<List<SeckillActivity>>().with(seckillActivityList)
                         .withVersion(SystemClock.millisClock().now());
             }
             // 更新分布式缓存
-            distributedCacheService.put(buildCacheKey(status), JSON.toJSONString(seckillActivitiesCache), 5 * 60);
-            log.info("seckillActivitiesCache|更新分布式缓存成功|{}", status);
-            return seckillActivitiesCache;
+            distributedCacheService.put(buildCacheKey(status), JSON.toJSONString(seckillActivityListCache), 5 * 60);
+            log.info("seckillActivityListCache|更新分布式缓存成功|{}", status);
+            return seckillActivityListCache;
         } catch (Exception e) {
-            log.error("seckillActivitiesCache|更新分布式缓存失败|{}", status, e);
+            log.error("seckillActivityListCache|更新分布式缓存失败|{}", status, e);
             return new SeckillBusinessCache<List<SeckillActivity>>().retryLater();
         } finally {
             distributedLock.unLock();
@@ -119,7 +119,7 @@ public class SeckillActivityListCacheServiceImpl implements SeckillActivityListC
 
     @Override
     public String buildCacheKey(Object key) {
-        return StringUtil.append(Constants.SECKILL_ACTIVITIES_CACHE_KEY, key);
+        return StringUtil.append(Constants.SECKILL_ACTIVITY_LIST_CACHE_KEY, key);
     }
 
 }
