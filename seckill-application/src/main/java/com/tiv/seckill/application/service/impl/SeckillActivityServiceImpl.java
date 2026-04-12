@@ -1,5 +1,7 @@
 package com.tiv.seckill.application.service.impl;
 
+import com.tiv.seckill.application.cache.model.SeckillBusinessCache;
+import com.tiv.seckill.application.cache.service.activity.SeckillActivityListCacheService;
 import com.tiv.seckill.application.service.SeckillActivityService;
 import com.tiv.seckill.domain.code.ErrorCodeEnum;
 import com.tiv.seckill.domain.dto.SeckillActivityDTO;
@@ -20,6 +22,9 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
 
     @Autowired
     private SeckillActivityRepository seckillActivityRepository;
+
+    @Autowired
+    private SeckillActivityListCacheService seckillActivityListCacheService;
 
     @Override
     public void saveSeckillActivity(SeckillActivityDTO seckillActivityDTO) {
@@ -52,6 +57,23 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
     @Override
     public SeckillActivity getSeckillActivityById(Long id) {
         return seckillActivityRepository.getSeckillActivityById(id);
+    }
+
+    @Override
+    public List<SeckillActivityDTO> getSeckillActivityList(Integer status, Long version) {
+        SeckillBusinessCache<List<SeckillActivity>> seckillActivitiesCache = seckillActivityListCacheService.getCachedActivities(status, version);
+        if (!seckillActivitiesCache.isExist()) {
+            throw new BusinessException(ErrorCodeEnum.PARAMS_ERROR, "活动不存在");
+        }
+        if (seckillActivitiesCache.isRetryLater()) {
+            throw new BusinessException(ErrorCodeEnum.RETRY_LATER);
+        }
+        return seckillActivitiesCache.getData().stream()
+                .map(seckillActivity -> {
+                    SeckillActivityDTO seckillActivityDTO = new SeckillActivityDTO();
+                    BeanUtil.copyProperties(seckillActivity, seckillActivityDTO);
+                    return seckillActivityDTO;
+                }).toList();
     }
 
 }

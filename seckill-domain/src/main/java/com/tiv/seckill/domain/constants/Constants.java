@@ -28,4 +28,9 @@ public class Constants {
      */
     public static final String JWT_SECRET = "a1b2c3d4e5f6g7h8i9j10";
 
+    /**
+     * 秒杀活动缓存key
+     */
+    public static final String SECKILL_ACTIVITIES_CACHE_KEY = "SECKILL_ACTIVITIES_CACHE_KEY";
+
 }

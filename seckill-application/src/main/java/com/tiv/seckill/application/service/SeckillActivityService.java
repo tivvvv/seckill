@@ -18,4 +18,6 @@ public interface SeckillActivityService {
 
     SeckillActivity getSeckillActivityById(Long id);
 
+    List<SeckillActivityDTO> getSeckillActivityList(Integer status, Long version);
+
 }
