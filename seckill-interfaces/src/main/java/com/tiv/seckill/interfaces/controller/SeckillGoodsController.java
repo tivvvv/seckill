@@ -42,8 +42,14 @@ public class SeckillGoodsController {
 
     @GetMapping("/list/dto")
     public Response<List<SeckillGoodsDTO>> getSeckillGoodsDTOList(@RequestParam(value = "activityId", required = true) Long activityId,
-                                                                     @RequestParam(value = "version", required = false) Long version) {
+                                                                  @RequestParam(value = "version", required = false) Long version) {
         return ResponseUtils.success(seckillGoodsService.getSeckillGoodsDTOList(activityId, version));
+    }
+
+    @GetMapping("/dto")
+    public Response<SeckillGoodsDTO> getSeckillGoodsDTO(@RequestParam(value = "id", required = true) Long id,
+                                                        @RequestParam(value = "version", required = false) Long version) {
+        return ResponseUtils.success(seckillGoodsService.getSeckillGoodsDTO(id, version));
     }
 
 }

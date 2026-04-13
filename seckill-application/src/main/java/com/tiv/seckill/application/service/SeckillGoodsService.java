@@ -21,4 +21,6 @@ public interface SeckillGoodsService {
 
     List<SeckillGoodsDTO> getSeckillGoodsDTOList(Long activityId, Long version);
 
+    SeckillGoodsDTO getSeckillGoodsDTO(Long id, Long version);
+
 }

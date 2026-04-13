@@ -75,8 +75,7 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
         }
         return seckillActivityListCache.getData().stream()
                 .map(seckillActivity -> {
-                    SeckillActivityDTO seckillActivityDTO = new SeckillActivityDTO();
-                    BeanUtil.copyProperties(seckillActivity, seckillActivityDTO);
+                    SeckillActivityDTO seckillActivityDTO = SeckillActivityBuilder.toSeckillActivityDTO(seckillActivity);
                     seckillActivityDTO.setVersion(seckillActivityListCache.getVersion());
                     return seckillActivityDTO;
                 }).toList();

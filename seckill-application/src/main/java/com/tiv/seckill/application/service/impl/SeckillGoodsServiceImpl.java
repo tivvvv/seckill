@@ -1,6 +1,8 @@
 package com.tiv.seckill.application.service.impl;
 
+import com.tiv.seckill.application.builder.SeckillGoodsBuilder;
 import com.tiv.seckill.application.cache.model.SeckillBusinessCache;
+import com.tiv.seckill.application.cache.service.goods.SeckillGoodsCacheService;
 import com.tiv.seckill.application.cache.service.goods.SeckillGoodsListCacheService;
 import com.tiv.seckill.application.service.SeckillGoodsService;
 import com.tiv.seckill.domain.code.ErrorCodeEnum;
@@ -29,6 +31,9 @@ public class SeckillGoodsServiceImpl implements SeckillGoodsService {
 
     @Autowired
     private SeckillGoodsListCacheService seckillGoodsListCacheService;
+
+    @Autowired
+    private SeckillGoodsCacheService seckillGoodsCacheService;
 
     @Override
     public int saveSeckillGoods(SeckillGoodsDTO seckillGoodsDTO) {
@@ -90,11 +95,27 @@ public class SeckillGoodsServiceImpl implements SeckillGoodsService {
         }
         return seckillGoodsListCache.getData().stream()
                 .map(seckillGoods -> {
-                    SeckillGoodsDTO seckillGoodsDTO = new SeckillGoodsDTO();
-                    BeanUtil.copyProperties(seckillGoods, seckillGoodsDTO);
+                    SeckillGoodsDTO seckillGoodsDTO = SeckillGoodsBuilder.toSeckillGoodsDTO(seckillGoods);
                     seckillGoodsDTO.setVersion(seckillGoodsListCache.getVersion());
                     return seckillGoodsDTO;
                 }).toList();
+    }
+
+    @Override
+    public SeckillGoodsDTO getSeckillGoodsDTO(Long id, Long version) {
+        if (id == null) {
+            throw new BusinessException(ErrorCodeEnum.PARAMS_ERROR);
+        }
+        SeckillBusinessCache<SeckillGoods> seckillGoodsCache = seckillGoodsCacheService.getCachedGoods(id, version);
+        if (!seckillGoodsCache.isExist()) {
+            throw new BusinessException(ErrorCodeEnum.PARAMS_ERROR, "商品不存在");
+        }
+        if (seckillGoodsCache.isRetryLater()) {
+            throw new BusinessException(ErrorCodeEnum.RETRY_LATER);
+        }
+        SeckillGoodsDTO seckillGoodsDTO = SeckillGoodsBuilder.toSeckillGoodsDTO(seckillGoodsCache.getData());
+        seckillGoodsDTO.setVersion(seckillGoodsCache.getVersion());
+        return seckillGoodsDTO;
     }
 
 }
