@@ -14,7 +14,7 @@ public interface SeckillGoodsRepository {
 
     SeckillGoods getSeckillGoodsById(Long id);
 
-    List<SeckillGoods> getSeckillGoodsByActivityId(Long activityId);
+    List<SeckillGoods> getSeckillGoodsListByActivityId(Long activityId);
 
     Integer getAvailableStockById(Long id);
 

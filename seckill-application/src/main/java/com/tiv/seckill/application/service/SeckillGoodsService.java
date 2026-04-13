@@ -19,4 +19,6 @@ public interface SeckillGoodsService {
 
     Integer getAvailableStockById(Long id);
 
+    List<SeckillGoodsDTO> getSeckillGoodsDTOList(Long activityId, Long version);
+
 }

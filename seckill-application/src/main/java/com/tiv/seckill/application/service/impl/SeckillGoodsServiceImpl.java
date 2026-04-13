@@ -1,5 +1,7 @@
 package com.tiv.seckill.application.service.impl;
 
+import com.tiv.seckill.application.cache.model.SeckillBusinessCache;
+import com.tiv.seckill.application.cache.service.goods.SeckillGoodsListCacheService;
 import com.tiv.seckill.application.service.SeckillGoodsService;
 import com.tiv.seckill.domain.code.ErrorCodeEnum;
 import com.tiv.seckill.domain.dto.SeckillGoodsDTO;
@@ -24,6 +26,9 @@ public class SeckillGoodsServiceImpl implements SeckillGoodsService {
 
     @Autowired
     private SeckillActivityRepository seckillActivityRepository;
+
+    @Autowired
+    private SeckillGoodsListCacheService seckillGoodsListCacheService;
 
     @Override
     public int saveSeckillGoods(SeckillGoodsDTO seckillGoodsDTO) {
@@ -63,12 +68,33 @@ public class SeckillGoodsServiceImpl implements SeckillGoodsService {
 
     @Override
     public List<SeckillGoods> getSeckillGoodsByActivityId(Long activityId) {
-        return seckillGoodsRepository.getSeckillGoodsByActivityId(activityId);
+        return seckillGoodsRepository.getSeckillGoodsListByActivityId(activityId);
     }
 
     @Override
     public Integer getAvailableStockById(Long id) {
         return seckillGoodsRepository.getAvailableStockById(id);
+    }
+
+    @Override
+    public List<SeckillGoodsDTO> getSeckillGoodsDTOList(Long activityId, Long version) {
+        if (activityId == null) {
+            throw new BusinessException(ErrorCodeEnum.PARAMS_ERROR, "activityId 为 null");
+        }
+        SeckillBusinessCache<List<SeckillGoods>> seckillGoodsListCache = seckillGoodsListCacheService.getCachedGoodsList(activityId, version);
+        if (!seckillGoodsListCache.isExist()) {
+            throw new BusinessException(ErrorCodeEnum.PARAMS_ERROR, "商品不存在");
+        }
+        if (seckillGoodsListCache.isRetryLater()) {
+            throw new BusinessException(ErrorCodeEnum.RETRY_LATER);
+        }
+        return seckillGoodsListCache.getData().stream()
+                .map(seckillGoods -> {
+                    SeckillGoodsDTO seckillGoodsDTO = new SeckillGoodsDTO();
+                    BeanUtil.copyProperties(seckillGoods, seckillGoodsDTO);
+                    seckillGoodsDTO.setVersion(seckillGoodsListCache.getVersion());
+                    return seckillGoodsDTO;
+                }).toList();
     }
 
 }

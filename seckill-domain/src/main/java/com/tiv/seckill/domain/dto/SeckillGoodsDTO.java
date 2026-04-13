@@ -78,6 +78,11 @@ public class SeckillGoodsDTO implements Serializable {
      */
     private Date endTime;
 
+    /**
+     * 版本号
+     */
+    private Long version;
+
     @Serial
     private static final long serialVersionUID = 1L;
 

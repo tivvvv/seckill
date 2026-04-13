@@ -45,7 +45,7 @@ public class SeckillGoodsRepositoryImpl implements SeckillGoodsRepository {
     }
 
     @Override
-    public List<SeckillGoods> getSeckillGoodsByActivityId(Long activityId) {
+    public List<SeckillGoods> getSeckillGoodsListByActivityId(Long activityId) {
         LambdaQueryWrapper<SeckillGoods> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(SeckillGoods::getActivityId, activityId);
         return seckillGoodsMapper.selectList(queryWrapper);

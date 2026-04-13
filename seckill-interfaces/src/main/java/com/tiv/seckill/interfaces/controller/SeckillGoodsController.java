@@ -40,4 +40,10 @@ public class SeckillGoodsController {
         return ResponseUtils.success(seckillGoodsService.getSeckillGoodsByActivityId(activityId));
     }
 
+    @GetMapping("/list/dto")
+    public Response<List<SeckillGoodsDTO>> getSeckillGoodsDTOList(@RequestParam(value = "activityId", required = true) Long activityId,
+                                                                     @RequestParam(value = "version", required = false) Long version) {
+        return ResponseUtils.success(seckillGoodsService.getSeckillGoodsDTOList(activityId, version));
+    }
+
 }
