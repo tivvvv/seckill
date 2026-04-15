@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -63,5 +64,13 @@ public class SeckillActivity implements Serializable {
     @Serial
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
+
+    public boolean validateParams() {
+        return !StringUtils.isEmpty(activityDesc)
+                && startTime != null
+                && endTime != null
+                && !endTime.before(startTime)
+                && !endTime.before(new Date());
+    }
 
 }

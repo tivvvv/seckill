@@ -10,7 +10,7 @@ import com.tiv.seckill.domain.dto.SeckillActivityDTO;
 import com.tiv.seckill.domain.enums.SeckillActivityStatusEnum;
 import com.tiv.seckill.domain.exception.BusinessException;
 import com.tiv.seckill.domain.model.SeckillActivity;
-import com.tiv.seckill.domain.repository.SeckillActivityRepository;
+import com.tiv.seckill.domain.service.SeckillActivityDomainService;
 import com.tiv.seckill.infra.util.bean.BeanUtil;
 import com.tiv.seckill.infra.util.id.SnowFlakeFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,7 @@ import java.util.List;
 public class SeckillActivityServiceImpl implements SeckillActivityService {
 
     @Autowired
-    private SeckillActivityRepository seckillActivityRepository;
+    private SeckillActivityDomainService seckillActivityDomainService;
 
     @Autowired
     private SeckillActivityListCacheService seckillActivityListCacheService;
@@ -41,27 +41,27 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
         seckillActivity.setId(SnowFlakeFactory.getSnowFlakeFromCache().nextId());
         seckillActivity.setStatus(SeckillActivityStatusEnum.PUBLISHED.getCode());
 
-        seckillActivityRepository.saveSeckillActivity(seckillActivity);
+        seckillActivityDomainService.saveSeckillActivity(seckillActivity);
     }
 
     @Override
-    public int updateStatus(Long id, Integer status) {
-        return seckillActivityRepository.updateStatus(id, status);
+    public void updateStatus(Long id, Integer status) {
+        seckillActivityDomainService.updateStatus(id, status);
     }
 
     @Override
     public List<SeckillActivity> getSeckillActivityDTOList(Integer status) {
-        return seckillActivityRepository.getSeckillActivityList(status);
+        return seckillActivityDomainService.getSeckillActivityList(status);
     }
 
     @Override
     public List<SeckillActivity> getSeckillActivityListByNow(Date currentTime, Integer status) {
-        return seckillActivityRepository.getSeckillActivityListByNow(currentTime, status);
+        return seckillActivityDomainService.getSeckillActivityListByNow(currentTime, status);
     }
 
     @Override
     public SeckillActivity getSeckillActivityById(Long id) {
-        return seckillActivityRepository.getSeckillActivityById(id);
+        return seckillActivityDomainService.getSeckillActivityById(id);
     }
 
     @Override

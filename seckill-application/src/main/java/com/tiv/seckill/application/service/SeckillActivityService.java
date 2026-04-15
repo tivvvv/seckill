@@ -10,7 +10,7 @@ public interface SeckillActivityService {
 
     void saveSeckillActivity(SeckillActivityDTO seckillActivityDTO);
 
-    int updateStatus(Long id, Integer status);
+    void updateStatus(Long id, Integer status);
 
     List<SeckillActivity> getSeckillActivityDTOList(Integer status);
 

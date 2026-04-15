@@ -26,9 +26,10 @@ public class SeckillActivityController {
     }
 
     @PostMapping("/update/status")
-    public Response<Integer> updateSeckillActivityStatus(@RequestParam(value = "id", required = true) Long id,
-                                                         @RequestParam(value = "status", required = true) Integer status) {
-        return ResponseUtils.success(seckillActivityService.updateStatus(id, status));
+    public Response<?> updateSeckillActivityStatus(@RequestParam(value = "id", required = true) Long id,
+                                                   @RequestParam(value = "status", required = true) Integer status) {
+        seckillActivityService.updateStatus(id, status);
+        return ResponseUtils.success();
     }
 
     @GetMapping("/list")
