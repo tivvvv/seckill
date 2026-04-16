@@ -1,10 +1,10 @@
-package com.tiv.seckill.domain.repository;
+package com.tiv.seckill.domain.service;
 
 import com.tiv.seckill.domain.model.SeckillOrder;
 
 import java.util.List;
 
-public interface SeckillOrderRepository {
+public interface SeckillOrderDomainService {
 
     boolean saveSeckillOrder(SeckillOrder seckillOrder);
 

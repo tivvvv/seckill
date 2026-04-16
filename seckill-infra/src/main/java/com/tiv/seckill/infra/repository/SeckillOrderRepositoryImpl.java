@@ -18,11 +18,11 @@ public class SeckillOrderRepositoryImpl implements SeckillOrderRepository {
     private SeckillOrderMapper seckillOrderMapper;
 
     @Override
-    public int saveSeckillOrder(SeckillOrder seckillOrder) {
+    public boolean saveSeckillOrder(SeckillOrder seckillOrder) {
         if (seckillOrder == null) {
             throw new BusinessException(ErrorCodeEnum.PARAMS_ERROR, "seckillOrder 为 null");
         }
-        return seckillOrderMapper.insert(seckillOrder);
+        return seckillOrderMapper.insert(seckillOrder) == 1;
     }
 
     @Override

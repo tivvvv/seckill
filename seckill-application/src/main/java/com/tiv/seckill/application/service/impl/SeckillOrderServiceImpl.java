@@ -9,7 +9,7 @@ import com.tiv.seckill.domain.enums.SeckillOrderStatusEnum;
 import com.tiv.seckill.domain.exception.BusinessException;
 import com.tiv.seckill.domain.model.SeckillGoods;
 import com.tiv.seckill.domain.model.SeckillOrder;
-import com.tiv.seckill.domain.repository.SeckillOrderRepository;
+import com.tiv.seckill.domain.service.SeckillOrderDomainService;
 import com.tiv.seckill.infra.util.bean.BeanUtil;
 import com.tiv.seckill.infra.util.id.SnowFlakeFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,11 +27,11 @@ public class SeckillOrderServiceImpl implements SeckillOrderService {
     private SeckillGoodsService seckillGoodsService;
 
     @Autowired
-    private SeckillOrderRepository seckillOrderRepository;
+    private SeckillOrderDomainService seckillOrderDomainService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int saveSeckillOrder(SeckillOrderDTO seckillOrderDTO) {
+    public SeckillOrder saveSeckillOrder(SeckillOrderDTO seckillOrderDTO) {
         if (seckillOrderDTO == null) {
             throw new BusinessException(ErrorCodeEnum.PARAMS_ERROR, "seckillOrderDTO 为 null");
         }
@@ -76,17 +76,19 @@ public class SeckillOrderServiceImpl implements SeckillOrderService {
         seckillGoodsService.decreaseAvailableStock(seckillOrder.getGoodsId(), seckillOrder.getQuantity());
 
         // 保存订单
-        return seckillOrderRepository.saveSeckillOrder(seckillOrder);
+        seckillOrderDomainService.saveSeckillOrder(seckillOrder);
+
+        return seckillOrder;
     }
 
     @Override
     public List<SeckillOrder> getSeckillOrderByUserId(Long userId) {
-        return seckillOrderRepository.getSeckillOrderByUserId(userId);
+        return seckillOrderDomainService.getSeckillOrderByUserId(userId);
     }
 
     @Override
     public List<SeckillOrder> getSeckillOrderByActivityId(Long activityId) {
-        return seckillOrderRepository.getSeckillOrderByActivityId(activityId);
+        return seckillOrderDomainService.getSeckillOrderByActivityId(activityId);
     }
 
 }

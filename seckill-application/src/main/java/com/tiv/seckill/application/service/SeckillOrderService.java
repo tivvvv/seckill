@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface SeckillOrderService {
 
-    int saveSeckillOrder(SeckillOrderDTO seckillOrderDTO);
+    SeckillOrder saveSeckillOrder(SeckillOrderDTO seckillOrderDTO);
 
     List<SeckillOrder> getSeckillOrderByUserId(Long userId);
 
