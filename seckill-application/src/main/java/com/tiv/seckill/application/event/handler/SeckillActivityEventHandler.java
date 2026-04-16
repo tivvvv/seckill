@@ -3,6 +3,7 @@ package com.tiv.seckill.application.event.handler;
 import com.alibaba.cola.dto.Response;
 import com.alibaba.cola.event.EventHandler;
 import com.alibaba.cola.event.EventHandlerI;
+import com.alibaba.fastjson.JSON;
 import com.tiv.seckill.application.cache.service.activity.SeckillActivityCacheService;
 import com.tiv.seckill.application.cache.service.activity.SeckillActivityListCacheService;
 import com.tiv.seckill.domain.event.SeckillActivityEvent;
@@ -21,7 +22,7 @@ public class SeckillActivityEventHandler implements EventHandlerI<Response, Seck
 
     @Override
     public Response execute(SeckillActivityEvent seckillActivityEvent) {
-        log.info("SeckillActivityEventHandler--execute--seckillActivityEvent:{}", seckillActivityEvent);
+        log.info("SeckillActivityEventHandler--execute--seckillActivityEvent:{}", JSON.toJSONString(seckillActivityEvent));
         if (seckillActivityEvent == null) {
             return Response.buildSuccess();
         }
