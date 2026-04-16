@@ -11,8 +11,8 @@ import com.tiv.seckill.domain.enums.SeckillActivityStatusEnum;
 import com.tiv.seckill.domain.exception.BusinessException;
 import com.tiv.seckill.domain.model.SeckillActivity;
 import com.tiv.seckill.domain.model.SeckillGoods;
-import com.tiv.seckill.domain.repository.SeckillActivityRepository;
-import com.tiv.seckill.domain.repository.SeckillGoodsRepository;
+import com.tiv.seckill.domain.service.SeckillActivityDomainService;
+import com.tiv.seckill.domain.service.SeckillGoodsDomainService;
 import com.tiv.seckill.infra.util.bean.BeanUtil;
 import com.tiv.seckill.infra.util.id.SnowFlakeFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,10 +24,10 @@ import java.util.List;
 public class SeckillGoodsServiceImpl implements SeckillGoodsService {
 
     @Autowired
-    private SeckillGoodsRepository seckillGoodsRepository;
+    private SeckillGoodsDomainService seckillGoodsDomainService;
 
     @Autowired
-    private SeckillActivityRepository seckillActivityRepository;
+    private SeckillActivityDomainService seckillActivityDomainService;
 
     @Autowired
     private SeckillGoodsListCacheService seckillGoodsListCacheService;
@@ -36,12 +36,12 @@ public class SeckillGoodsServiceImpl implements SeckillGoodsService {
     private SeckillGoodsCacheService seckillGoodsCacheService;
 
     @Override
-    public int saveSeckillGoods(SeckillGoodsDTO seckillGoodsDTO) {
+    public void saveSeckillGoods(SeckillGoodsDTO seckillGoodsDTO) {
         if (seckillGoodsDTO == null) {
             throw new BusinessException(ErrorCodeEnum.PARAMS_ERROR, "seckillGoodsDTO 为 null");
         }
 
-        SeckillActivity seckillActivity = seckillActivityRepository.getSeckillActivityById(seckillGoodsDTO.getActivityId());
+        SeckillActivity seckillActivity = seckillActivityDomainService.getSeckillActivityById(seckillGoodsDTO.getActivityId());
         if (seckillActivity == null) {
             throw new BusinessException(ErrorCodeEnum.PARAMS_ERROR, "秒杀活动不存在");
         }
@@ -53,32 +53,32 @@ public class SeckillGoodsServiceImpl implements SeckillGoodsService {
         seckillGoods.setAvailableStock(seckillGoodsDTO.getInitialStock());
         seckillGoods.setStartTime(seckillActivity.getStartTime());
         seckillGoods.setEndTime(seckillActivity.getEndTime());
-        return seckillGoodsRepository.saveSeckillGoods(seckillGoods);
+        seckillGoodsDomainService.saveSeckillGoods(seckillGoods);
     }
 
     @Override
-    public int updateStatus(Long id, Integer status) {
-        return seckillGoodsRepository.updateStatus(id, status);
+    public void updateStatus(Long id, Integer status) {
+        seckillGoodsDomainService.updateStatus(id, status);
     }
 
     @Override
-    public int decreaseAvailableStock(Long id, Integer count) {
-        return seckillGoodsRepository.decreaseAvailableStock(id, count);
+    public void decreaseAvailableStock(Long id, Integer count) {
+        seckillGoodsDomainService.decreaseAvailableStock(id, count);
     }
 
     @Override
     public SeckillGoods getSeckillGoodsById(Long id) {
-        return seckillGoodsRepository.getSeckillGoodsById(id);
+        return seckillGoodsDomainService.getSeckillGoodsById(id);
     }
 
     @Override
     public List<SeckillGoods> getSeckillGoodsByActivityId(Long activityId) {
-        return seckillGoodsRepository.getSeckillGoodsListByActivityId(activityId);
+        return seckillGoodsDomainService.getSeckillGoodsListByActivityId(activityId);
     }
 
     @Override
     public Integer getAvailableStockById(Long id) {
-        return seckillGoodsRepository.getAvailableStockById(id);
+        return seckillGoodsDomainService.getAvailableStockById(id);
     }
 
     @Override

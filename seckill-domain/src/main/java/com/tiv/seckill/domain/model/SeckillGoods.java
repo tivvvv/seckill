@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -106,5 +107,22 @@ public class SeckillGoods implements Serializable {
     @Serial
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
+
+    public boolean validateParams() {
+        return !StringUtils.isEmpty(goodsName)
+                && activityId != null
+                && startTime != null
+                && endTime != null
+                && !startTime.after(endTime)
+                && !endTime.before(new Date())
+                && activityPrice != null
+                && activityPrice.compareTo(BigDecimal.ZERO) >= 0
+                && originalPrice != null
+                && originalPrice.compareTo(BigDecimal.ZERO) >= 0
+                && initialStock != null
+                && initialStock > 0
+                && limitNum != null
+                && limitNum > 0;
+    }
 
 }

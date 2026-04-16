@@ -7,11 +7,11 @@ import java.util.List;
 
 public interface SeckillGoodsService {
 
-    int saveSeckillGoods(SeckillGoodsDTO seckillGoodsDTO);
+    void saveSeckillGoods(SeckillGoodsDTO seckillGoodsDTO);
 
-    int updateStatus(Long id, Integer status);
+    void updateStatus(Long id, Integer status);
 
-    int decreaseAvailableStock(Long id, Integer count);
+    void decreaseAvailableStock(Long id, Integer count);
 
     SeckillGoods getSeckillGoodsById(Long id);
 
