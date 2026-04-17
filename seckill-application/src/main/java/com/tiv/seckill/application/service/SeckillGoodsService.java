@@ -13,6 +13,8 @@ public interface SeckillGoodsService {
 
     void decreaseAvailableStock(Long id, Integer count);
 
+    boolean decreaseAvailableDbStock(Long id, Integer count);
+
     SeckillGoods getSeckillGoodsById(Long id);
 
     List<SeckillGoods> getSeckillGoodsByActivityId(Long activityId);

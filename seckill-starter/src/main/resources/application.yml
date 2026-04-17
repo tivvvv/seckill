@@ -62,3 +62,7 @@ cache:
 lock:
   distributed:
     type: redisson
+
+order:
+  place:
+    type: db

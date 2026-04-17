@@ -1,7 +1,7 @@
 package com.tiv.seckill.interfaces.controller;
 
+import com.tiv.seckill.application.command.SeckillOrderCommand;
 import com.tiv.seckill.application.service.SeckillOrderService;
-import com.tiv.seckill.domain.dto.SeckillOrderDTO;
 import com.tiv.seckill.domain.model.SeckillOrder;
 import com.tiv.seckill.domain.response.Response;
 import com.tiv.seckill.domain.response.ResponseUtils;
@@ -18,9 +18,8 @@ public class SeckillOrderController {
     private SeckillOrderService seckillOrderService;
 
     @PostMapping("/save")
-    public Response<String> saveSeckillOrder(@RequestBody SeckillOrderDTO seckillOrderDTO) {
-        seckillOrderService.saveSeckillOrder(seckillOrderDTO);
-        return ResponseUtils.success();
+    public Response<Long> saveSeckillOrder(@RequestAttribute Long userId, @RequestBody SeckillOrderCommand seckillOrderCommand) {
+        return ResponseUtils.success(seckillOrderService.saveSeckillOrder(userId, seckillOrderCommand));
     }
 
     @GetMapping("/list/user/{userId}")

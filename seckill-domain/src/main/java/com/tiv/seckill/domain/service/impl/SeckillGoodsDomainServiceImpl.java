@@ -54,7 +54,7 @@ public class SeckillGoodsDomainServiceImpl implements SeckillGoodsDomainService 
     }
 
     @Override
-    public void decreaseAvailableStock(Long id, Integer count) {
+    public boolean decreaseAvailableStock(Long id, Integer count) {
         if (id == null || count == null || count <= 0) {
             throw new BusinessException(ErrorCodeEnum.PARAMS_ERROR, "秒杀商品参数异常");
         }
@@ -62,11 +62,24 @@ public class SeckillGoodsDomainServiceImpl implements SeckillGoodsDomainService 
         if (seckillGoods == null) {
             throw new BusinessException(ErrorCodeEnum.NOT_FOUND_ERROR, "秒杀商品不存在");
         }
-        seckillGoodsRepository.decreaseAvailableStock(id, count);
+        boolean updateSuccess = seckillGoodsRepository.decreaseAvailableStock(id, count) > 0;
 
-        SeckillGoodsEvent seckillGoodsEvent = new SeckillGoodsEvent(id, seckillGoods.getStatus(), seckillGoods.getActivityId());
-        eventPublisher.publish(seckillGoodsEvent);
-        log.info("goodsPublish|扣减秒杀商品库存事件发布成功|{}", seckillGoodsEvent.getId());
+        if (updateSuccess) {
+            SeckillGoodsEvent seckillGoodsEvent = new SeckillGoodsEvent(id, seckillGoods.getStatus(), seckillGoods.getActivityId());
+            eventPublisher.publish(seckillGoodsEvent);
+            log.info("goodsPublish|扣减秒杀商品库存事件发布成功|{}", id);
+        } else {
+            log.info("goodsPublish|秒杀商品库存未扣减|{}", id);
+        }
+        return updateSuccess;
+    }
+
+    @Override
+    public boolean decreaseAvailableDbStock(Long id, Integer count) {
+        if (id == null || count == null || count <= 0) {
+            throw new BusinessException(ErrorCodeEnum.PARAMS_ERROR, "秒杀商品参数异常");
+        }
+        return seckillGoodsRepository.decreaseAvailableStock(id, count) > 0;
     }
 
     @Override

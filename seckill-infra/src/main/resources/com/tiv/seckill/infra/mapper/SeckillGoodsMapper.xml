@@ -8,6 +8,7 @@
         UPDATE seckill_goods
         SET available_stock = available_stock - #{count}
         WHERE id = #{id}
+          AND available_stock >= #{count}
     </update>
 
 </mapper>
