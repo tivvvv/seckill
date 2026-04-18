@@ -20,4 +20,8 @@ public interface DistributedCacheService {
 
     Boolean hasKey(String key);
 
+    Long increment(String key, Long delta);
+
+    Long decrement(String key, Long delta);
+
 }

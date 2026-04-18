@@ -4,6 +4,8 @@ public class Constants {
 
     public static final String USER_LOGIN_KEY_PREFIX = "user:login:";
 
+    public static final String ORDER_LOCK_KEY_PREFIX = "order:lock:";
+
     public static String getKey(String prefix, String key) {
         return prefix.concat(key);
     }
@@ -47,5 +49,10 @@ public class Constants {
      * 秒杀商品缓存key
      */
     public static final String SECKILL_GOODS_CACHE_KEY = "SECKILL_GOODS_CACHE_KEY";
+
+    /**
+     * 秒杀商品库存缓存key
+     */
+    public static final String SECKILL_GOODS_STOCK_CACHE_KEY = "SECKILL_GOODS_STOCK_CACHE_KEY";
 
 }

@@ -87,4 +87,14 @@ public class RedisCacheService implements DistributedCacheService {
         return redisTemplate.hasKey(key);
     }
 
+    @Override
+    public Long increment(String key, Long delta) {
+        return redisTemplate.opsForValue().increment(key, delta);
+    }
+
+    @Override
+    public Long decrement(String key, Long delta) {
+        return redisTemplate.opsForValue().decrement(key, delta);
+    }
+
 }

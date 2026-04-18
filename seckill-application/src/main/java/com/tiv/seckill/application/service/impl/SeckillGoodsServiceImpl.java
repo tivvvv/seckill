@@ -4,8 +4,10 @@ import com.tiv.seckill.application.builder.SeckillGoodsBuilder;
 import com.tiv.seckill.application.cache.model.SeckillBusinessCache;
 import com.tiv.seckill.application.cache.service.goods.SeckillGoodsCacheService;
 import com.tiv.seckill.application.cache.service.goods.SeckillGoodsListCacheService;
+import com.tiv.seckill.application.command.SeckillGoodsCommand;
 import com.tiv.seckill.application.service.SeckillGoodsService;
 import com.tiv.seckill.domain.code.ErrorCodeEnum;
+import com.tiv.seckill.domain.constants.Constants;
 import com.tiv.seckill.domain.dto.SeckillGoodsDTO;
 import com.tiv.seckill.domain.enums.SeckillActivityStatusEnum;
 import com.tiv.seckill.domain.exception.BusinessException;
@@ -13,13 +15,15 @@ import com.tiv.seckill.domain.model.SeckillActivity;
 import com.tiv.seckill.domain.model.SeckillGoods;
 import com.tiv.seckill.domain.service.SeckillActivityDomainService;
 import com.tiv.seckill.domain.service.SeckillGoodsDomainService;
-import com.tiv.seckill.infra.util.bean.BeanUtil;
+import com.tiv.seckill.infra.cache.distributed.DistributedCacheService;
 import com.tiv.seckill.infra.util.id.SnowFlakeFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @Service
 public class SeckillGoodsServiceImpl implements SeckillGoodsService {
 
@@ -35,25 +39,36 @@ public class SeckillGoodsServiceImpl implements SeckillGoodsService {
     @Autowired
     private SeckillGoodsCacheService seckillGoodsCacheService;
 
+    @Autowired
+    private DistributedCacheService distributedCacheService;
+
     @Override
-    public void saveSeckillGoods(SeckillGoodsDTO seckillGoodsDTO) {
-        if (seckillGoodsDTO == null) {
-            throw new BusinessException(ErrorCodeEnum.PARAMS_ERROR, "seckillGoodsDTO 为 null");
+    public void saveSeckillGoods(SeckillGoodsCommand seckillGoodsCommand) {
+        if (seckillGoodsCommand == null) {
+            throw new BusinessException(ErrorCodeEnum.PARAMS_ERROR, "seckillGoodsCommand 为 null");
         }
 
-        SeckillActivity seckillActivity = seckillActivityDomainService.getSeckillActivityById(seckillGoodsDTO.getActivityId());
+        SeckillActivity seckillActivity = seckillActivityDomainService.getSeckillActivityById(seckillGoodsCommand.getActivityId());
         if (seckillActivity == null) {
             throw new BusinessException(ErrorCodeEnum.PARAMS_ERROR, "秒杀活动不存在");
         }
 
-        SeckillGoods seckillGoods = new SeckillGoods();
-        BeanUtil.copyProperties(seckillGoodsDTO, seckillGoods);
-        seckillGoods.setId(SnowFlakeFactory.getSnowFlakeFromCache().nextId());
-        seckillGoods.setStatus(SeckillActivityStatusEnum.PUBLISHED.getCode());
-        seckillGoods.setAvailableStock(seckillGoodsDTO.getInitialStock());
-        seckillGoods.setStartTime(seckillActivity.getStartTime());
-        seckillGoods.setEndTime(seckillActivity.getEndTime());
-        seckillGoodsDomainService.saveSeckillGoods(seckillGoods);
+        SeckillGoods seckillGoods = SeckillGoodsBuilder.toSeckillGoods(seckillGoodsCommand);
+        seckillGoods.setId(SnowFlakeFactory.getSnowFlakeFromCache().nextId())
+                .setStatus(SeckillActivityStatusEnum.PUBLISHED.getCode())
+                .setAvailableStock(seckillGoodsCommand.getInitialStock())
+                .setStartTime(seckillActivity.getStartTime())
+                .setEndTime(seckillActivity.getEndTime());
+        String cacheKey = Constants.getKey(Constants.SECKILL_GOODS_STOCK_CACHE_KEY, String.valueOf(seckillGoods.getId()));
+        try {
+            distributedCacheService.put(cacheKey, seckillGoods.getAvailableStock());
+            seckillGoodsDomainService.saveSeckillGoods(seckillGoods);
+        } catch (Exception e) {
+            if (distributedCacheService.hasKey(cacheKey)) {
+                distributedCacheService.delete(cacheKey);
+            }
+            throw new BusinessException(ErrorCodeEnum.SYSTEM_ERROR, e.getMessage());
+        }
     }
 
     @Override

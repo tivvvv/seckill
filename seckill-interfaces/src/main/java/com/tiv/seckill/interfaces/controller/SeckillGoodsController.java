@@ -1,5 +1,6 @@
 package com.tiv.seckill.interfaces.controller;
 
+import com.tiv.seckill.application.command.SeckillGoodsCommand;
 import com.tiv.seckill.application.service.SeckillGoodsService;
 import com.tiv.seckill.domain.dto.SeckillGoodsDTO;
 import com.tiv.seckill.domain.model.SeckillGoods;
@@ -18,8 +19,8 @@ public class SeckillGoodsController {
     private SeckillGoodsService seckillGoodsService;
 
     @PostMapping("/save")
-    public Response<String> saveSeckillGoods(@RequestBody SeckillGoodsDTO seckillGoodsDTO) {
-        seckillGoodsService.saveSeckillGoods(seckillGoodsDTO);
+    public Response<String> saveSeckillGoods(@RequestBody SeckillGoodsCommand seckillGoodsCommand) {
+        seckillGoodsService.saveSeckillGoods(seckillGoodsCommand);
         return ResponseUtils.success();
     }
 

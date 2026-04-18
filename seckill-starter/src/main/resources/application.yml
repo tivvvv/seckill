@@ -65,4 +65,4 @@ lock:
 
 order:
   place:
-    type: db
+    type: lock

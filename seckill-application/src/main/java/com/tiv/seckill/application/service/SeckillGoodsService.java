@@ -1,5 +1,6 @@
 package com.tiv.seckill.application.service;
 
+import com.tiv.seckill.application.command.SeckillGoodsCommand;
 import com.tiv.seckill.domain.dto.SeckillGoodsDTO;
 import com.tiv.seckill.domain.model.SeckillGoods;
 
@@ -7,7 +8,7 @@ import java.util.List;
 
 public interface SeckillGoodsService {
 
-    void saveSeckillGoods(SeckillGoodsDTO seckillGoodsDTO);
+    void saveSeckillGoods(SeckillGoodsCommand seckillGoodsCommand);
 
     void updateStatus(Long id, Integer status);
 
