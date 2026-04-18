@@ -55,4 +55,19 @@ public class Constants {
      */
     public static final String SECKILL_GOODS_STOCK_CACHE_KEY = "SECKILL_GOODS_STOCK_CACHE_KEY";
 
+    /**
+     * LUA脚本运行结果 商品库存不存在
+     */
+    public static final int LUA_RESULT_GOODS_STOCK_NOT_EXISTS = -1;
+
+    /**
+     * LUA脚本运行结果 库存不足
+     */
+    public static final int LUA_RESULT_GOODS_STOCK_LT_ZERO = -2;
+
+    /**
+     * LUA脚本运行结果 参数错误
+     */
+    public static final int LUA_RESULT_GOODS_PARAMS_ERROR = -3;
+
 }

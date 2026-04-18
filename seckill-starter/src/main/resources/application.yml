@@ -65,4 +65,4 @@ lock:
 
 order:
   place:
-    type: lock
+    type: lua

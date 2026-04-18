@@ -61,7 +61,7 @@ public class SeckillGoodsServiceImpl implements SeckillGoodsService {
                 .setEndTime(seckillActivity.getEndTime());
         String cacheKey = Constants.getKey(Constants.SECKILL_GOODS_STOCK_CACHE_KEY, String.valueOf(seckillGoods.getId()));
         try {
-            distributedCacheService.put(cacheKey, seckillGoods.getAvailableStock());
+            distributedCacheService.initByLua(cacheKey, seckillGoods.getAvailableStock());
             seckillGoodsDomainService.saveSeckillGoods(seckillGoods);
         } catch (Exception e) {
             if (distributedCacheService.hasKey(cacheKey)) {

@@ -24,4 +24,12 @@ public interface DistributedCacheService {
 
     Long decrement(String key, Long delta);
 
+    Long initByLua(String key, Integer quantity);
+
+    Long incrementByLua(String key, Integer quantity);
+
+    Long decrementByLua(String key, Integer quantity);
+
+    void checkLuaResult(Long result);
+
 }

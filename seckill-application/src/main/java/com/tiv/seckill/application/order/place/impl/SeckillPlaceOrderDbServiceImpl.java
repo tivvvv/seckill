@@ -31,7 +31,7 @@ public class SeckillPlaceOrderDbServiceImpl implements SeckillPlaceOrderService 
         this.checkSeckillGoods(seckillOrderCommand, seckillGoodsDTO);
         // 扣减库存
         if (!seckillGoodsService.decreaseAvailableDbStock(seckillOrderCommand.getGoodsId(), seckillOrderCommand.getQuantity())) {
-            throw new BusinessException(ErrorCodeEnum.OPERATION_ERROR, "库存不足");
+            throw new BusinessException(ErrorCodeEnum.FORBIDDEN_ERROR, "库存不足");
         }
         // 构建订单
         SeckillOrder seckillOrder = this.buildSeckillOrder(userId, seckillOrderCommand, seckillGoodsDTO);

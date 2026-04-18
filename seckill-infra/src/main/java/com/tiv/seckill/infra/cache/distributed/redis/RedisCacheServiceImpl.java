@@ -1,14 +1,20 @@
 package com.tiv.seckill.infra.cache.distributed.redis;
 
 import com.alibaba.fastjson.JSON;
+import com.tiv.seckill.domain.code.ErrorCodeEnum;
+import com.tiv.seckill.domain.constants.Constants;
+import com.tiv.seckill.domain.exception.BusinessException;
 import com.tiv.seckill.infra.cache.distributed.DistributedCacheService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -17,10 +23,42 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Service
 @ConditionalOnProperty(name = "cache.distributed.type", havingValue = "redis")
-public class RedisCacheService implements DistributedCacheService {
+public class RedisCacheServiceImpl implements DistributedCacheService {
 
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
+
+    /**
+     * 初始化库存脚本.
+     */
+    private static final DefaultRedisScript<Long> INIT_GOODS_STOCK_SCRIPT;
+
+    /**
+     * 增加库存脚本.
+     */
+    private static final DefaultRedisScript<Long> INCREMENT_GOODS_STOCK_SCRIPT;
+
+    /**
+     * 扣减库存脚本.
+     */
+    private static final DefaultRedisScript<Long> DECREMENT_GOODS_STOCK_SCRIPT;
+
+    static {
+        // 初始化库存
+        INIT_GOODS_STOCK_SCRIPT = new DefaultRedisScript<>();
+        INIT_GOODS_STOCK_SCRIPT.setLocation(new ClassPathResource("lua/init_goods_stock.lua"));
+        INIT_GOODS_STOCK_SCRIPT.setResultType(Long.class);
+
+        // 增加库存
+        INCREMENT_GOODS_STOCK_SCRIPT = new DefaultRedisScript<>();
+        INCREMENT_GOODS_STOCK_SCRIPT.setLocation(new ClassPathResource("lua/increment_goods_stock.lua"));
+        INCREMENT_GOODS_STOCK_SCRIPT.setResultType(Long.class);
+
+        // 扣减库存
+        DECREMENT_GOODS_STOCK_SCRIPT = new DefaultRedisScript<>();
+        DECREMENT_GOODS_STOCK_SCRIPT.setLocation(new ClassPathResource("lua/decrement_goods_stock.lua"));
+        DECREMENT_GOODS_STOCK_SCRIPT.setResultType(Long.class);
+    }
 
     @Override
     public void put(String key, Object value) {
@@ -95,6 +133,36 @@ public class RedisCacheService implements DistributedCacheService {
     @Override
     public Long decrement(String key, Long delta) {
         return redisTemplate.opsForValue().decrement(key, delta);
+    }
+
+    @Override
+    public Long initByLua(String key, Integer quantity) {
+        return redisTemplate.execute(INIT_GOODS_STOCK_SCRIPT, Collections.singletonList(key), quantity);
+    }
+
+    @Override
+    public Long incrementByLua(String key, Integer quantity) {
+        return redisTemplate.execute(INCREMENT_GOODS_STOCK_SCRIPT, Collections.singletonList(key), quantity);
+    }
+
+    @Override
+    public Long decrementByLua(String key, Integer quantity) {
+        return redisTemplate.execute(DECREMENT_GOODS_STOCK_SCRIPT, Collections.singletonList(key), quantity);
+    }
+
+    @Override
+    public void checkLuaResult(Long result) {
+        if (result == Constants.LUA_RESULT_GOODS_STOCK_NOT_EXISTS) {
+            throw new BusinessException(ErrorCodeEnum.NOT_FOUND_ERROR, "商品库存不存在");
+        }
+
+        if (result == Constants.LUA_RESULT_GOODS_STOCK_LT_ZERO) {
+            throw new BusinessException(ErrorCodeEnum.FORBIDDEN_ERROR, "商品库存不足");
+        }
+
+        if (result == Constants.LUA_RESULT_GOODS_PARAMS_ERROR) {
+            throw new BusinessException(ErrorCodeEnum.PARAMS_ERROR, "商品参数错误");
+        }
     }
 
 }
