@@ -1,0 +1,83 @@
+server:
+  port: 9991
+  tomcat:
+    accept-count: 1000
+    threads:
+      max: 800
+      min-spare: 100
+    accesslog:
+      enabled: true
+      pattern: '%h %l %u %t "%r" %s %b %D'
+      directory: logs
+
+spring:
+  application:
+    name: seckill-activity
+  mvc:
+    static-path-pattern: /**
+  web:
+    resources:
+      static-locations: classpath:/static/
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/seckill?useUnicode=true&characterEncoding=utf-8&useSSL=false&allowPublicKeyRetrieval=true&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&allowMultiQueries=true
+    username: root
+    password: root
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      initial-size: 5
+      min-idle: 10
+      max-active: 30
+      max-wait: 60000
+      test-while-idle: true
+      time-between-eviction-runs-millis: 10000
+      test-on-borrow: false
+      test-on-return: false
+      validation-query: select 1
+      filters: stat
+  redis:
+    host: localhost
+    port: 6379
+    database: 0
+    jedis:
+      pool:
+        max-active: 50
+        min-idle: 20
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    enable-sql-runner: true
+    db-config:
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+cache:
+  local:
+    type: guava
+  distributed:
+    type: redis
+
+lock:
+  distributed:
+    type: redisson
+
+dubbo:
+  application:
+    name: ${spring.application.name}
+    metadata-type: remote
+  metadata-report:
+    address: nacos://localhost:18375
+  registry:
+    address: nacos://localhost:18375?register-consumer-url=true
+    register-mode: all
+  protocol:
+    name: dubbo
+    port: 20881
+
+order:
+  place:
+    type: lua

@@ -9,12 +9,13 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <modules>
-        <module>seckill-application</module>
-        <module>seckill-domain</module>
-        <module>seckill-infra</module>
-        <module>seckill-interfaces</module>
+        <module>seckill-dubbo</module>
         <module>seckill-nginx</module>
-        <module>seckill-starter</module>
+        <module>seckill-activity</module>
+        <module>seckill-common</module>
+        <module>seckill-goods</module>
+        <module>seckill-order</module>
+        <module>seckill-user</module>
     </modules>
 
     <parent>
@@ -47,16 +48,32 @@
         <jwt.version>3.4.0</jwt.version>
         <redisson.version>3.24.2</redisson.version>
         <cola.version>3.0.0</cola.version>
+        <dubbo3.version>3.2.9</dubbo3.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <!-- spring-boot -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
                 <version>${spring-boot.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+
+            <!-- dubbo -->
+            <dependency>
+                <groupId>org.apache.dubbo</groupId>
+                <artifactId>dubbo-spring-boot-starter</artifactId>
+                <version>${dubbo3.version}</version>
+            </dependency>
+
+            <!-- nacos -->
+            <dependency>
+                <groupId>org.apache.dubbo</groupId>
+                <artifactId>dubbo-registry-nacos</artifactId>
+                <version>${dubbo3.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
