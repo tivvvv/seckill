@@ -40,6 +40,11 @@ public class SeckillGoodsRepositoryImpl implements SeckillGoodsRepository {
     }
 
     @Override
+    public int increaseAvailableStock(Long id, Integer count) {
+        return seckillGoodsMapper.increaseAvailableStock(id, count);
+    }
+
+    @Override
     public SeckillGoods getSeckillGoodsById(Long id) {
         return seckillGoodsMapper.selectById(id);
     }

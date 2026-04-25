@@ -78,13 +78,18 @@ public class SeckillGoodsServiceImpl implements SeckillGoodsService {
     }
 
     @Override
-    public void decreaseAvailableStock(Long id, Integer count) {
-        seckillGoodsDomainService.decreaseAvailableStock(id, count);
+    public boolean decreaseAvailableStock(Long id, Integer count) {
+        return seckillGoodsDomainService.decreaseAvailableStock(id, count);
     }
 
     @Override
     public boolean decreaseAvailableDbStock(Long id, Integer count) {
         return seckillGoodsDomainService.decreaseAvailableDbStock(id, count);
+    }
+
+    @Override
+    public boolean increaseAvailableStock(Long id, Integer count) {
+        return seckillGoodsDomainService.increaseAvailableStock(id, count);
     }
 
     @Override

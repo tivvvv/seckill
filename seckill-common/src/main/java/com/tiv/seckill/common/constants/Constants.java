@@ -6,6 +6,12 @@ public class Constants {
 
     public static final String ORDER_LOCK_KEY_PREFIX = "order:lock:";
 
+    public static final String ORDER_TRY_KEY_PREFIX = "order:try:";
+
+    public static final String ORDER_CONFIRM_KEY_PREFIX = "order:confirm:";
+
+    public static final String ORDER_CANCEL_KEY_PREFIX = "order:cancel:";
+
     public static String getKey(String prefix, String key) {
         return prefix.concat(key);
     }
@@ -69,5 +75,7 @@ public class Constants {
      * LUA脚本运行结果 参数错误
      */
     public static final int LUA_RESULT_GOODS_PARAMS_ERROR = -3;
+
+    public static final String GOODS = "goods";
 
 }

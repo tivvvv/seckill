@@ -12,9 +12,11 @@ public interface SeckillGoodsService {
 
     void updateStatus(Long id, Integer status);
 
-    void decreaseAvailableStock(Long id, Integer count);
+    boolean decreaseAvailableStock(Long id, Integer count);
 
     boolean decreaseAvailableDbStock(Long id, Integer count);
+
+    boolean increaseAvailableStock(Long id, Integer count);
 
     SeckillGoods getSeckillGoodsById(Long id);
 

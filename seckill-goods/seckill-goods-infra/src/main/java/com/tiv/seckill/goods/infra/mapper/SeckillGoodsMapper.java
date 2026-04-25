@@ -8,4 +8,6 @@ public interface SeckillGoodsMapper extends BaseMapper<SeckillGoods> {
 
     int decreaseAvailableStock(@Param("id") Long id, @Param("count") Integer count);
 
+    int increaseAvailableStock(@Param("id") Long id, @Param("count") Integer count);
+
 }

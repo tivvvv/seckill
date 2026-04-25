@@ -14,6 +14,8 @@ public interface SeckillGoodsDomainService {
 
     boolean decreaseAvailableDbStock(Long id, Integer count);
 
+    boolean increaseAvailableStock(Long id, Integer count);
+
     SeckillGoods getSeckillGoodsById(Long id);
 
     List<SeckillGoods> getSeckillGoodsListByActivityId(Long activityId);

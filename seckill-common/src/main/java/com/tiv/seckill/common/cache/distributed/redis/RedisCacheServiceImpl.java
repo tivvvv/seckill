@@ -126,6 +126,21 @@ public class RedisCacheServiceImpl implements DistributedCacheService {
     }
 
     @Override
+    public Long addSet(String key, Object... values) {
+        return redisTemplate.opsForSet().add(key, values);
+    }
+
+    @Override
+    public Long removeSet(String key, Object... values) {
+        return redisTemplate.opsForSet().remove(key, values);
+    }
+
+    @Override
+    public Boolean inSet(String key, Object value) {
+        return redisTemplate.opsForSet().isMember(key, value);
+    }
+
+    @Override
     public Long increment(String key, Long delta) {
         return redisTemplate.opsForValue().increment(key, delta);
     }

@@ -20,6 +20,12 @@ public interface DistributedCacheService {
 
     Boolean hasKey(String key);
 
+    Long addSet(String key, Object... values);
+
+    Long removeSet(String key, Object... values);
+
+    Boolean inSet(String key, Object value);
+
     Long increment(String key, Long delta);
 
     Long decrement(String key, Long delta);

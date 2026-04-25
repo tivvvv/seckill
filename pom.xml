@@ -48,7 +48,8 @@
         <jwt.version>3.4.0</jwt.version>
         <redisson.version>3.24.2</redisson.version>
         <cola.version>3.0.0</cola.version>
-        <dubbo3.version>3.2.9</dubbo3.version>
+        <dubbo3.version>3.0.7</dubbo3.version>
+        <hmily.version>2.1.2</hmily.version>
     </properties>
 
     <dependencyManagement>

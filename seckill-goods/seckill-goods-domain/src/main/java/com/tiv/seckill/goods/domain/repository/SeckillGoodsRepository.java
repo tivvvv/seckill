@@ -12,6 +12,8 @@ public interface SeckillGoodsRepository {
 
     int decreaseAvailableStock(Long id, Integer count);
 
+    int increaseAvailableStock(Long id, Integer count);
+
     SeckillGoods getSeckillGoodsById(Long id);
 
     List<SeckillGoods> getSeckillGoodsListByActivityId(Long activityId);

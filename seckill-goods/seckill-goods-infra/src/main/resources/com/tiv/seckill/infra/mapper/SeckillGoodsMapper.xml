@@ -11,4 +11,10 @@
           AND available_stock >= #{count}
     </update>
 
+    <update id="increaseAvailableStock">
+        UPDATE seckill_goods
+        SET available_stock = available_stock + #{count}
+        WHERE id = #{id}
+    </update>
+
 </mapper>
