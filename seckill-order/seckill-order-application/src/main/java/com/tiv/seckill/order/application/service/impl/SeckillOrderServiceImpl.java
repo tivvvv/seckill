@@ -2,6 +2,7 @@ package com.tiv.seckill.order.application.service.impl;
 
 import com.tiv.seckill.common.exception.BusinessException;
 import com.tiv.seckill.common.exception.ErrorCodeEnum;
+import com.tiv.seckill.common.util.id.SnowFlakeFactory;
 import com.tiv.seckill.order.application.command.SeckillOrderCommand;
 import com.tiv.seckill.order.application.place.SeckillPlaceOrderService;
 import com.tiv.seckill.order.application.service.SeckillOrderService;
@@ -28,7 +29,7 @@ public class SeckillOrderServiceImpl implements SeckillOrderService {
         if (seckillOrderCommand == null) {
             throw new BusinessException(ErrorCodeEnum.PARAMS_ERROR);
         }
-        return seckillPlaceOrderService.placeOrder(userId, seckillOrderCommand);
+        return seckillPlaceOrderService.placeOrder(userId, seckillOrderCommand, SnowFlakeFactory.getSnowFlakeFromCache().nextId());
     }
 
     @Override

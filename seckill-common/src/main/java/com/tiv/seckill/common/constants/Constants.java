@@ -78,4 +78,6 @@ public class Constants {
 
     public static final String GOODS = "goods";
 
+    public static final String ORDER = "order";
+
 }

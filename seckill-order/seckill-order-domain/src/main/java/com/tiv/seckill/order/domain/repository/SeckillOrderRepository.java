@@ -12,4 +12,6 @@ public interface SeckillOrderRepository {
 
     List<SeckillOrder> getSeckillOrderByActivityId(Long activityId);
 
+    boolean deleteSeckillOrder(Long orderId);
+
 }

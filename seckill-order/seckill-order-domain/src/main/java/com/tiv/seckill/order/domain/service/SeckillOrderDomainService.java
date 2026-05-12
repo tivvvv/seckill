@@ -12,4 +12,6 @@ public interface SeckillOrderDomainService {
 
     List<SeckillOrder> getSeckillOrderByActivityId(Long activityId);
 
+    void deleteSeckillOrder(Long orderId);
+
 }

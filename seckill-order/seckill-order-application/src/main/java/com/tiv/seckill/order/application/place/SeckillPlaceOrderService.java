@@ -22,7 +22,7 @@ public interface SeckillPlaceOrderService {
      * @param seckillOrderCommand
      * @return
      */
-    Long placeOrder(Long userId, SeckillOrderCommand seckillOrderCommand);
+    Long placeOrder(Long userId, SeckillOrderCommand seckillOrderCommand, Long txId);
 
     default SeckillOrder buildSeckillOrder(Long userId, SeckillOrderCommand seckillOrderCommand, SeckillGoodsDTO seckillGoodsDTO) {
         SeckillOrder seckillOrder = new SeckillOrder();

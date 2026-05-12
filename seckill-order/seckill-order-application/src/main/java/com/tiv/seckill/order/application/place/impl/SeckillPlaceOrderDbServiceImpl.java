@@ -1,44 +1,65 @@
 package com.tiv.seckill.order.application.place.impl;
 
+import com.tiv.seckill.common.constants.Constants;
 import com.tiv.seckill.common.exception.BusinessException;
 import com.tiv.seckill.common.exception.ErrorCodeEnum;
 import com.tiv.seckill.common.model.dto.SeckillGoodsDTO;
-import com.tiv.seckill.dubbo.interfaces.goods.SeckillGoodsDubboService;
 import com.tiv.seckill.order.application.command.SeckillOrderCommand;
 import com.tiv.seckill.order.application.place.SeckillPlaceOrderService;
 import com.tiv.seckill.order.domain.model.SeckillOrder;
-import com.tiv.seckill.order.domain.service.SeckillOrderDomainService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.dromara.hmily.annotation.HmilyTCC;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
 @ConditionalOnProperty(name = "order.place.type", havingValue = "db")
-public class SeckillPlaceOrderDbServiceImpl implements SeckillPlaceOrderService {
-
-    @DubboReference(version = "1.0.0")
-    private SeckillGoodsDubboService seckillGoodsDubboService;
-
-    @Autowired
-    private SeckillOrderDomainService seckillOrderDomainService;
+public class SeckillPlaceOrderDbServiceImpl extends SeckillPlaceOrderBaseServiceImpl implements SeckillPlaceOrderService {
 
     @Override
-    public Long placeOrder(Long userId, SeckillOrderCommand seckillOrderCommand) {
-        SeckillGoodsDTO seckillGoodsDTO = seckillGoodsDubboService.getSeckillGoodsDTO(seckillOrderCommand.getGoodsId(), seckillOrderCommand.getVersion());
-        // 校验商品状态
-        this.checkSeckillGoods(seckillOrderCommand, seckillGoodsDTO);
-        // 扣减库存
-        if (!seckillGoodsDubboService.decreaseAvailableDbStock(seckillOrderCommand.getGoodsId(), seckillOrderCommand.getQuantity())) {
-            throw new BusinessException(ErrorCodeEnum.FORBIDDEN_ERROR, "库存不足");
+    @Transactional(rollbackFor = Exception.class)
+    @HmilyTCC(confirmMethod = "confirmMethod", cancelMethod = "cancelMethod")
+    public Long placeOrder(Long userId, SeckillOrderCommand seckillOrderCommand, Long txId) {
+        String tryKey = Constants.getKey(Constants.ORDER_TRY_KEY_PREFIX, Constants.ORDER);
+        // 幂等处理
+        if (distributedCacheService.inSet(tryKey, txId)) {
+            log.warn("placeOrder|基于数据库实现库存防超卖-提交订单ry方法已执行过|{}", txId);
+            return txId;
         }
-        // 构建订单
-        SeckillOrder seckillOrder = this.buildSeckillOrder(userId, seckillOrderCommand, seckillGoodsDTO);
-        // 保存订单
-        seckillOrderDomainService.saveSeckillOrder(seckillOrder);
-        return seckillOrder.getId();
+        // 悬挂处理
+        if (distributedCacheService.inSet(Constants.getKey(Constants.ORDER_CONFIRM_KEY_PREFIX, Constants.ORDER), txId)
+                || distributedCacheService.inSet(Constants.getKey(Constants.ORDER_CANCEL_KEY_PREFIX, Constants.ORDER), txId)) {
+            log.warn("placeOrder|基于数据库实现库存防超卖-提交订单confirm或cancel方法已执行过|{}", txId);
+            return txId;
+        }
+        boolean isTryRecorded = false;
+        try {
+            // 获取商品
+            SeckillGoodsDTO seckillGoodsDTO = seckillGoodsDubboService.getSeckillGoodsDTO(seckillOrderCommand.getGoodsId(), seckillOrderCommand.getVersion());
+            // 校验商品状态
+            this.checkSeckillGoods(seckillOrderCommand, seckillGoodsDTO);
+            // 扣减库存
+            if (!seckillGoodsDubboService.decreaseAvailableStock(seckillOrderCommand.getGoodsId(), seckillOrderCommand.getQuantity(), txId)) {
+                throw new BusinessException(ErrorCodeEnum.FORBIDDEN_ERROR, "库存不足");
+            }
+            // 构建订单
+            SeckillOrder seckillOrder = this.buildSeckillOrder(userId, seckillOrderCommand, seckillGoodsDTO);
+            // 事务id作为订单id
+            seckillOrder.setId(txId);
+            distributedCacheService.addSet(tryKey, txId);
+            isTryRecorded = true;
+            // 保存订单
+            seckillOrderDomainService.saveSeckillOrder(seckillOrder);
+            return seckillOrder.getId();
+        } catch (Exception e) {
+            log.error("placeOrder|基于数据库实现库存防超卖-提交订单try方法执行失败|{}", txId, e);
+            if (isTryRecorded) {
+                distributedCacheService.removeSet(tryKey, txId);
+            }
+            throw new BusinessException(ErrorCodeEnum.OPERATION_ERROR, "下单失败");
+        }
     }
 
 }
