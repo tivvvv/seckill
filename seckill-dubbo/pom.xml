@@ -69,6 +69,14 @@
                     <groupId>org.dromara</groupId>
                     <artifactId>hmily-repository-mongodb</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>com.ctrip.framework.apollo</groupId>
+                    <artifactId>apollo-client</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.ctrip.framework.apollo</groupId>
+                    <artifactId>apollo-core</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
     </dependencies>
