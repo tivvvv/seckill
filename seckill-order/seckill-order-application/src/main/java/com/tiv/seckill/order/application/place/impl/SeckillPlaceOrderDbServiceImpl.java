@@ -32,7 +32,7 @@ public class SeckillPlaceOrderDbServiceImpl extends SeckillPlaceOrderBaseService
         if (distributedCacheService.inSet(Constants.getKey(Constants.ORDER_CONFIRM_KEY_PREFIX, Constants.ORDER), txId)
                 || distributedCacheService.inSet(Constants.getKey(Constants.ORDER_CANCEL_KEY_PREFIX, Constants.ORDER), txId)) {
             log.warn("placeOrder|基于数据库实现库存防超卖-提交订单confirm或cancel方法已执行过|{}", txId);
-            return txId;
+            throw new BusinessException(ErrorCodeEnum.OPERATION_ERROR, "订单TCC事务已结束");
         }
         boolean isTryRecorded = false;
         try {

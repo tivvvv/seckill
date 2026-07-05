@@ -76,6 +76,31 @@ class SeckillGoodsDubboServiceImplTest {
     }
 
     @Test
+    void confirmMethodReturnsSuccessWhenConfirmAlreadyExecuted() {
+        Long goodsId = 1L;
+        Integer count = 2;
+        Long txId = 3L;
+        when(distributedCacheService.inSet(TRY_KEY, txId)).thenReturn(true);
+        when(distributedCacheService.inSet(CONFIRM_KEY, txId)).thenReturn(true);
+
+        assertTrue(seckillGoodsDubboService.confirmMethod(goodsId, count, txId));
+
+        verify(distributedCacheService, never()).addSet(CONFIRM_KEY, txId);
+    }
+
+    @Test
+    void confirmMethodThrowsWhenConfirmRecordFails() {
+        Long goodsId = 1L;
+        Integer count = 2;
+        Long txId = 3L;
+        when(distributedCacheService.inSet(TRY_KEY, txId)).thenReturn(true);
+        when(distributedCacheService.inSet(CONFIRM_KEY, txId)).thenReturn(false);
+        when(distributedCacheService.addSet(CONFIRM_KEY, txId)).thenThrow(new RuntimeException("redis failed"));
+
+        assertThrows(BusinessException.class, () -> seckillGoodsDubboService.confirmMethod(goodsId, count, txId));
+    }
+
+    @Test
     void cancelMethodRecordsCancelWhenTryNotExecuted() {
         Long goodsId = 1L;
         Integer count = 2;
@@ -87,6 +112,33 @@ class SeckillGoodsDubboServiceImplTest {
 
         verify(distributedCacheService).addSet(CANCEL_KEY, txId);
         verify(seckillGoodsService, never()).increaseAvailableStock(goodsId, count);
+    }
+
+    @Test
+    void cancelMethodReturnsSuccessWhenCancelAlreadyExecuted() {
+        Long goodsId = 1L;
+        Integer count = 2;
+        Long txId = 3L;
+        when(distributedCacheService.inSet(CANCEL_KEY, txId)).thenReturn(true);
+
+        assertTrue(seckillGoodsDubboService.cancelMethod(goodsId, count, txId));
+
+        verify(seckillGoodsService, never()).increaseAvailableStock(goodsId, count);
+    }
+
+    @Test
+    void cancelMethodThrowsAndRemovesCancelRecordWhenStockRollbackFails() {
+        Long goodsId = 1L;
+        Integer count = 2;
+        Long txId = 3L;
+        when(distributedCacheService.inSet(CANCEL_KEY, txId)).thenReturn(false);
+        when(distributedCacheService.inSet(TRY_KEY, txId)).thenReturn(true);
+        when(distributedCacheService.addSet(CANCEL_KEY, txId)).thenReturn(1L);
+        when(seckillGoodsService.increaseAvailableStock(goodsId, count)).thenReturn(false);
+
+        assertThrows(BusinessException.class, () -> seckillGoodsDubboService.cancelMethod(goodsId, count, txId));
+
+        verify(distributedCacheService).removeSet(CANCEL_KEY, txId);
     }
 
     @Test

@@ -2,6 +2,8 @@ package com.tiv.seckill.order.application.place.impl;
 
 import com.tiv.seckill.common.cache.distributed.DistributedCacheService;
 import com.tiv.seckill.common.constants.Constants;
+import com.tiv.seckill.common.exception.BusinessException;
+import com.tiv.seckill.common.exception.ErrorCodeEnum;
 import com.tiv.seckill.dubbo.interfaces.goods.SeckillGoodsDubboService;
 import com.tiv.seckill.order.application.command.SeckillOrderCommand;
 import com.tiv.seckill.order.domain.service.SeckillOrderDomainService;
@@ -42,7 +44,7 @@ public class SeckillPlaceOrderBaseServiceImpl {
             distributedCacheService.addSet(confirmKey, txId);
         } catch (Exception e) {
             log.error("confirmMethod|提交订单confirm方法执行失败|{}", txId, e);
-            distributedCacheService.removeSet(confirmKey, txId);
+            throw new BusinessException(ErrorCodeEnum.SYSTEM_ERROR, e.getMessage());
         }
         return txId;
     }
@@ -68,9 +70,14 @@ public class SeckillPlaceOrderBaseServiceImpl {
             isCancelRecorded = true;
             seckillOrderDomainService.deleteSeckillOrder(txId);
         } catch (Exception e) {
+            log.error("cancelMethod|提交订单cancel方法执行失败|{}", txId, e);
             if (isCancelRecorded) {
                 distributedCacheService.removeSet(cancelKey, txId);
             }
+            if (e instanceof BusinessException) {
+                throw (BusinessException) e;
+            }
+            throw new BusinessException(ErrorCodeEnum.SYSTEM_ERROR, e.getMessage());
         }
         return txId;
     }

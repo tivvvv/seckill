@@ -23,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -62,6 +63,9 @@ class SeckillPlaceOrderServiceImplTest {
 
     @InjectMocks
     private SeckillPlaceOrderLockServiceImpl lockPlaceOrderService;
+
+    @InjectMocks
+    private SeckillPlaceOrderDbServiceImpl dbPlaceOrderService;
 
     @Test
     void luaPlaceOrderRollsBackTryAndCachedStockWhenGoodsTryReturnsFalse() {
@@ -109,13 +113,61 @@ class SeckillPlaceOrderServiceImplTest {
     }
 
     @Test
-    void placeOrderDoesNotExecuteWhenCancelRecorded() {
+    void confirmMethodThrowsWhenConfirmRecordFails() {
+        SeckillOrderCommand command = buildCommand();
+        when(distributedCacheService.inSet(TRY_KEY, TX_ID)).thenReturn(true);
+        when(distributedCacheService.inSet(CONFIRM_KEY, TX_ID)).thenReturn(false);
+        when(distributedCacheService.addSet(CONFIRM_KEY, TX_ID)).thenThrow(new RuntimeException("redis failed"));
+
+        assertThrows(BusinessException.class, () -> luaPlaceOrderService.confirmMethod(USER_ID, command, TX_ID));
+    }
+
+    @Test
+    void cancelMethodThrowsAndRemovesCancelRecordWhenDeleteFails() {
+        SeckillOrderCommand command = buildCommand();
+        when(distributedCacheService.inSet(CANCEL_KEY, TX_ID)).thenReturn(false);
+        when(distributedCacheService.inSet(TRY_KEY, TX_ID)).thenReturn(true);
+        when(distributedCacheService.addSet(CANCEL_KEY, TX_ID)).thenReturn(1L);
+        doThrow(new RuntimeException("delete failed")).when(seckillOrderDomainService).deleteSeckillOrder(TX_ID);
+
+        assertThrows(BusinessException.class, () -> luaPlaceOrderService.cancelMethod(USER_ID, command, TX_ID));
+
+        verify(distributedCacheService).removeSet(CANCEL_KEY, TX_ID);
+    }
+
+    @Test
+    void luaPlaceOrderThrowsWhenCancelRecorded() {
         SeckillOrderCommand command = buildCommand();
         when(distributedCacheService.inSet(TRY_KEY, TX_ID)).thenReturn(false);
         when(distributedCacheService.inSet(CONFIRM_KEY, TX_ID)).thenReturn(false);
         when(distributedCacheService.inSet(CANCEL_KEY, TX_ID)).thenReturn(true);
 
-        assertEquals(TX_ID, luaPlaceOrderService.placeOrder(USER_ID, command, TX_ID));
+        assertThrows(BusinessException.class, () -> luaPlaceOrderService.placeOrder(USER_ID, command, TX_ID));
+
+        verify(seckillGoodsDubboService, never()).getSeckillGoodsDTO(GOODS_ID, VERSION);
+        verify(seckillOrderDomainService, never()).saveSeckillOrder(any(SeckillOrder.class));
+    }
+
+    @Test
+    void lockPlaceOrderThrowsWhenCancelRecorded() {
+        SeckillOrderCommand command = buildCommand();
+        when(distributedCacheService.inSet(TRY_KEY, TX_ID)).thenReturn(false);
+        when(distributedCacheService.inSet(CONFIRM_KEY, TX_ID)).thenReturn(false);
+        when(distributedCacheService.inSet(CANCEL_KEY, TX_ID)).thenReturn(true);
+
+        assertThrows(BusinessException.class, () -> lockPlaceOrderService.placeOrder(USER_ID, command, TX_ID));
+
+        verify(seckillGoodsDubboService, never()).getSeckillGoodsDTO(GOODS_ID, VERSION);
+        verify(seckillOrderDomainService, never()).saveSeckillOrder(any(SeckillOrder.class));
+    }
+
+    @Test
+    void dbPlaceOrderThrowsWhenConfirmRecorded() {
+        SeckillOrderCommand command = buildCommand();
+        when(distributedCacheService.inSet(TRY_KEY, TX_ID)).thenReturn(false);
+        when(distributedCacheService.inSet(CONFIRM_KEY, TX_ID)).thenReturn(true);
+
+        assertThrows(BusinessException.class, () -> dbPlaceOrderService.placeOrder(USER_ID, command, TX_ID));
 
         verify(seckillGoodsDubboService, never()).getSeckillGoodsDTO(GOODS_ID, VERSION);
         verify(seckillOrderDomainService, never()).saveSeckillOrder(any(SeckillOrder.class));

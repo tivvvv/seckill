@@ -76,7 +76,7 @@ public class SeckillGoodsDubboServiceImpl implements SeckillGoodsDubboService {
         String confirmKey = Constants.getKey(Constants.ORDER_CONFIRM_KEY_PREFIX, Constants.GOODS);
         if (distributedCacheService.inSet(confirmKey, txId)) {
             log.warn("confirmMethod|扣减库存confirm方法已执行过|{}", txId);
-            return false;
+            return true;
         }
 
         log.info("confirmMethod|扣减库存confirm方法开始执行|{}", txId);
@@ -85,9 +85,8 @@ public class SeckillGoodsDubboServiceImpl implements SeckillGoodsDubboService {
             return true;
         } catch (Exception e) {
             log.error("confirmMethod|扣减库存confirm方法执行失败|{}", txId, e);
-            distributedCacheService.removeSet(confirmKey, txId);
+            throw new BusinessException(ErrorCodeEnum.SYSTEM_ERROR, e.getMessage());
         }
-        return false;
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -109,14 +108,20 @@ public class SeckillGoodsDubboServiceImpl implements SeckillGoodsDubboService {
         try {
             distributedCacheService.addSet(cancelKey, txId);
             isCancelRecorded = true;
-            return seckillGoodsService.increaseAvailableStock(id, count);
+            if (!seckillGoodsService.increaseAvailableStock(id, count)) {
+                throw new BusinessException(ErrorCodeEnum.OPERATION_ERROR, "库存回滚失败");
+            }
+            return true;
         } catch (Exception e) {
             log.error("cancelMethod|扣减库存cancel方法执行失败|{}", txId, e);
             if (isCancelRecorded) {
                 distributedCacheService.removeSet(cancelKey, txId);
             }
+            if (e instanceof BusinessException) {
+                throw (BusinessException) e;
+            }
+            throw new BusinessException(ErrorCodeEnum.SYSTEM_ERROR, e.getMessage());
         }
-        return false;
     }
 
 }
