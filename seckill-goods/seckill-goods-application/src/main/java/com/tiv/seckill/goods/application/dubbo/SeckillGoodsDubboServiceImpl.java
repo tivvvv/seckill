@@ -52,7 +52,12 @@ public class SeckillGoodsDubboServiceImpl implements SeckillGoodsDubboService {
         try {
             distributedCacheService.addSet(tryKey, txId);
             isTryRecorded = true;
-            return seckillGoodsService.decreaseAvailableStock(id, count);
+            if (!seckillGoodsService.decreaseAvailableStock(id, count)) {
+                distributedCacheService.removeSet(tryKey, txId);
+                isTryRecorded = false;
+                throw new BusinessException(ErrorCodeEnum.FORBIDDEN_ERROR, "库存不足");
+            }
+            return true;
         } catch (Exception e) {
             log.error("decreaseAvailableStock|扣减库存try方法执行失败|{}", txId, e);
             if (isTryRecorded) {
