@@ -73,7 +73,9 @@ public class SeckillPlaceOrderLockServiceImpl extends SeckillPlaceOrderBaseServi
             SeckillOrder seckillOrder = this.buildSeckillOrder(userId, seckillOrderCommand, seckillGoodsDTO);
             seckillOrder.setId(txId);
             // 保存订单
-            seckillOrderDomainService.saveSeckillOrder(seckillOrder);
+            if (!seckillOrderDomainService.saveSeckillOrder(seckillOrder)) {
+                throw new BusinessException(ErrorCodeEnum.OPERATION_ERROR, "保存订单失败");
+            }
             // 保存try日志
             distributedCacheService.addSet(tryKey, txId);
             isTryRecorded = true;

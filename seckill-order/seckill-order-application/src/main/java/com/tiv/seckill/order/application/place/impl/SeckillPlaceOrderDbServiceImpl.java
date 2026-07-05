@@ -51,7 +51,9 @@ public class SeckillPlaceOrderDbServiceImpl extends SeckillPlaceOrderBaseService
             distributedCacheService.addSet(tryKey, txId);
             isTryRecorded = true;
             // 保存订单
-            seckillOrderDomainService.saveSeckillOrder(seckillOrder);
+            if (!seckillOrderDomainService.saveSeckillOrder(seckillOrder)) {
+                throw new BusinessException(ErrorCodeEnum.OPERATION_ERROR, "保存订单失败");
+            }
             return seckillOrder.getId();
         } catch (Exception e) {
             log.error("placeOrder|基于数据库实现库存防超卖-提交订单try方法执行失败|{}", txId, e);

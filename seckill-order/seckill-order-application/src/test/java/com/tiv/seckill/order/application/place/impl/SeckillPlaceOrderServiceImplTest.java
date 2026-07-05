@@ -83,6 +83,21 @@ class SeckillPlaceOrderServiceImplTest {
     }
 
     @Test
+    void luaPlaceOrderRollsBackCachedStockWhenOrderSaveReturnsFalse() {
+        SeckillOrderCommand command = buildCommand();
+        mockOrderTccStatusNotExecuted();
+        when(seckillGoodsDubboService.getSeckillGoodsDTO(GOODS_ID, VERSION)).thenReturn(buildGoodsDTO());
+        when(distributedCacheService.decrementByLua(STOCK_CACHE_KEY, QUANTITY)).thenReturn(1L);
+        when(seckillOrderDomainService.saveSeckillOrder(any(SeckillOrder.class))).thenReturn(false);
+
+        assertThrows(BusinessException.class, () -> luaPlaceOrderService.placeOrder(USER_ID, command, TX_ID));
+
+        verify(distributedCacheService).incrementByLua(STOCK_CACHE_KEY, QUANTITY);
+        verify(distributedCacheService, never()).addSet(TRY_KEY, TX_ID);
+        verify(seckillGoodsDubboService, never()).decreaseAvailableStock(GOODS_ID, QUANTITY, TX_ID);
+    }
+
+    @Test
     void lockPlaceOrderRollsBackTryAndCachedStockWhenGoodsTryReturnsFalse() throws InterruptedException {
         SeckillOrderCommand command = buildCommand();
         mockOrderTccStatusNotExecuted();
@@ -97,6 +112,24 @@ class SeckillPlaceOrderServiceImplTest {
 
         verify(distributedCacheService).removeSet(TRY_KEY, TX_ID);
         verify(distributedCacheService).increment(STOCK_CACHE_KEY, Long.valueOf(QUANTITY));
+        verify(distributedLock).unLock();
+    }
+
+    @Test
+    void lockPlaceOrderRollsBackCachedStockWhenOrderSaveReturnsFalse() throws InterruptedException {
+        SeckillOrderCommand command = buildCommand();
+        mockOrderTccStatusNotExecuted();
+        when(seckillGoodsDubboService.getSeckillGoodsDTO(GOODS_ID, VERSION)).thenReturn(buildGoodsDTO());
+        when(distributedLockFactory.getDistributedLock(LOCK_KEY)).thenReturn(distributedLock);
+        when(distributedLock.tryLock(2L, 5L, TimeUnit.SECONDS)).thenReturn(true);
+        when(distributedCacheService.getObject(STOCK_CACHE_KEY, Integer.class)).thenReturn(10);
+        when(seckillOrderDomainService.saveSeckillOrder(any(SeckillOrder.class))).thenReturn(false);
+
+        assertThrows(BusinessException.class, () -> lockPlaceOrderService.placeOrder(USER_ID, command, TX_ID));
+
+        verify(distributedCacheService).increment(STOCK_CACHE_KEY, Long.valueOf(QUANTITY));
+        verify(distributedCacheService, never()).addSet(TRY_KEY, TX_ID);
+        verify(seckillGoodsDubboService, never()).decreaseAvailableStock(GOODS_ID, QUANTITY, TX_ID);
         verify(distributedLock).unLock();
     }
 
@@ -171,6 +204,20 @@ class SeckillPlaceOrderServiceImplTest {
 
         verify(seckillGoodsDubboService, never()).getSeckillGoodsDTO(GOODS_ID, VERSION);
         verify(seckillOrderDomainService, never()).saveSeckillOrder(any(SeckillOrder.class));
+    }
+
+    @Test
+    void dbPlaceOrderRemovesTryRecordWhenOrderSaveReturnsFalse() {
+        SeckillOrderCommand command = buildCommand();
+        mockOrderTccStatusNotExecuted();
+        when(seckillGoodsDubboService.getSeckillGoodsDTO(GOODS_ID, VERSION)).thenReturn(buildGoodsDTO());
+        when(seckillGoodsDubboService.decreaseAvailableStock(GOODS_ID, QUANTITY, TX_ID)).thenReturn(true);
+        when(distributedCacheService.addSet(TRY_KEY, TX_ID)).thenReturn(1L);
+        when(seckillOrderDomainService.saveSeckillOrder(any(SeckillOrder.class))).thenReturn(false);
+
+        assertThrows(BusinessException.class, () -> dbPlaceOrderService.placeOrder(USER_ID, command, TX_ID));
+
+        verify(distributedCacheService).removeSet(TRY_KEY, TX_ID);
     }
 
     private void mockOrderTccStatusNotExecuted() {
