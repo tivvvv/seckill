@@ -64,6 +64,18 @@ class SeckillGoodsDubboServiceImplTest {
     }
 
     @Test
+    void decreaseAvailableStockReturnsSuccessWhenTryAlreadyExecuted() {
+        Long goodsId = 1L;
+        Integer count = 2;
+        Long txId = 3L;
+        when(distributedCacheService.inSet(TRY_KEY, txId)).thenReturn(true);
+
+        assertTrue(seckillGoodsDubboService.decreaseAvailableStock(goodsId, count, txId));
+
+        verify(seckillGoodsService, never()).decreaseAvailableStock(goodsId, count);
+    }
+
+    @Test
     void cancelMethodRecordsCancelWhenTryNotExecuted() {
         Long goodsId = 1L;
         Integer count = 2;

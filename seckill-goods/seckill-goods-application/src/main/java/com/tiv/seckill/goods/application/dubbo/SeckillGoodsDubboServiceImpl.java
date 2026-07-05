@@ -41,7 +41,7 @@ public class SeckillGoodsDubboServiceImpl implements SeckillGoodsDubboService {
         String tryKey = Constants.getKey(Constants.ORDER_TRY_KEY_PREFIX, Constants.GOODS);
         if (distributedCacheService.inSet(tryKey, txId)) {
             log.warn("decreaseAvailableStock|扣减库存try方法已执行过|{}", txId);
-            return false;
+            return true;
         }
         if (distributedCacheService.inSet(Constants.getKey(Constants.ORDER_CONFIRM_KEY_PREFIX, Constants.GOODS), txId)
                 || distributedCacheService.inSet(Constants.getKey(Constants.ORDER_CANCEL_KEY_PREFIX, Constants.GOODS), txId)) {
