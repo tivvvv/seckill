@@ -30,7 +30,7 @@ public class SecurityAdapter implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(authInterceptor)
                 .addPathPatterns("/**")
-                .excludePathPatterns("/user/login")
+                .excludePathPatterns("/user/login", "/user/register")
                 .excludePathPatterns(DOC_PATH_PATTERNS);
     }
 

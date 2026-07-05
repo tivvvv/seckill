@@ -18,4 +18,9 @@ public class UserRepositoryImpl implements UserRepository {
         return userMapper.selectOne(new QueryWrapper<User>().eq("user_name", userName));
     }
 
+    @Override
+    public void saveUser(User user) {
+        userMapper.insert(user);
+    }
+
 }

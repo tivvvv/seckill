@@ -67,7 +67,8 @@ CREATE TABLE user
     `user_name` varchar(20) NULL DEFAULT '' COMMENT '用户名',
     `password`  varchar(64) NULL DEFAULT '' COMMENT '密码',
     `status`    int(2)      NULL DEFAULT 1 COMMENT '状态 1:正常 2:冻结',
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_user_name` (`user_name`)
 ) COMMENT = '用户';
 
 SET FOREIGN_KEY_CHECKS = 1;
