@@ -92,14 +92,16 @@ public class SeckillGoodsDubboServiceImpl implements SeckillGoodsDubboService {
 
     @Transactional(rollbackFor = Exception.class)
     public boolean cancelMethod(Long id, Integer count, Long txId) {
-        if (!distributedCacheService.inSet(Constants.getKey(Constants.ORDER_TRY_KEY_PREFIX, Constants.GOODS), txId)) {
-            log.warn("cancelMethod|扣减库存try方法执行失败|{}", txId);
-            return false;
-        }
+        String tryKey = Constants.getKey(Constants.ORDER_TRY_KEY_PREFIX, Constants.GOODS);
         String cancelKey = Constants.getKey(Constants.ORDER_CANCEL_KEY_PREFIX, Constants.GOODS);
         if (distributedCacheService.inSet(cancelKey, txId)) {
             log.warn("cancelMethod|扣减库存cancel方法已执行过|{}", txId);
-            return false;
+            return true;
+        }
+        if (!distributedCacheService.inSet(tryKey, txId)) {
+            log.warn("cancelMethod|扣减库存空回滚|{}", txId);
+            distributedCacheService.addSet(cancelKey, txId);
+            return true;
         }
 
         log.info("cancelMethod|扣减库存cancel方法开始执行|{}", txId);

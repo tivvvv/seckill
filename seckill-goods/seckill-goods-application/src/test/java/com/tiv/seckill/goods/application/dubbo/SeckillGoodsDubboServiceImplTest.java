@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
@@ -61,4 +62,33 @@ class SeckillGoodsDubboServiceImplTest {
 
         verify(distributedCacheService, never()).removeSet(TRY_KEY, txId);
     }
+
+    @Test
+    void cancelMethodRecordsCancelWhenTryNotExecuted() {
+        Long goodsId = 1L;
+        Integer count = 2;
+        Long txId = 3L;
+        when(distributedCacheService.inSet(CANCEL_KEY, txId)).thenReturn(false);
+        when(distributedCacheService.inSet(TRY_KEY, txId)).thenReturn(false);
+
+        assertTrue(seckillGoodsDubboService.cancelMethod(goodsId, count, txId));
+
+        verify(distributedCacheService).addSet(CANCEL_KEY, txId);
+        verify(seckillGoodsService, never()).increaseAvailableStock(goodsId, count);
+    }
+
+    @Test
+    void decreaseAvailableStockDoesNotExecuteWhenCancelRecorded() {
+        Long goodsId = 1L;
+        Integer count = 2;
+        Long txId = 3L;
+        when(distributedCacheService.inSet(TRY_KEY, txId)).thenReturn(false);
+        when(distributedCacheService.inSet(CONFIRM_KEY, txId)).thenReturn(false);
+        when(distributedCacheService.inSet(CANCEL_KEY, txId)).thenReturn(true);
+
+        assertFalse(seckillGoodsDubboService.decreaseAvailableStock(goodsId, count, txId));
+
+        verify(seckillGoodsService, never()).decreaseAvailableStock(goodsId, count);
+    }
+
 }

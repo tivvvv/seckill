@@ -20,8 +20,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.util.concurrent.TimeUnit;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -94,6 +96,31 @@ class SeckillPlaceOrderServiceImplTest {
         verify(distributedLock).unLock();
     }
 
+    @Test
+    void cancelMethodRecordsCancelWhenTryNotExecuted() {
+        SeckillOrderCommand command = buildCommand();
+        when(distributedCacheService.inSet(CANCEL_KEY, TX_ID)).thenReturn(false);
+        when(distributedCacheService.inSet(TRY_KEY, TX_ID)).thenReturn(false);
+
+        assertEquals(TX_ID, luaPlaceOrderService.cancelMethod(USER_ID, command, TX_ID));
+
+        verify(distributedCacheService).addSet(CANCEL_KEY, TX_ID);
+        verify(seckillOrderDomainService, never()).deleteSeckillOrder(TX_ID);
+    }
+
+    @Test
+    void placeOrderDoesNotExecuteWhenCancelRecorded() {
+        SeckillOrderCommand command = buildCommand();
+        when(distributedCacheService.inSet(TRY_KEY, TX_ID)).thenReturn(false);
+        when(distributedCacheService.inSet(CONFIRM_KEY, TX_ID)).thenReturn(false);
+        when(distributedCacheService.inSet(CANCEL_KEY, TX_ID)).thenReturn(true);
+
+        assertEquals(TX_ID, luaPlaceOrderService.placeOrder(USER_ID, command, TX_ID));
+
+        verify(seckillGoodsDubboService, never()).getSeckillGoodsDTO(GOODS_ID, VERSION);
+        verify(seckillOrderDomainService, never()).saveSeckillOrder(any(SeckillOrder.class));
+    }
+
     private void mockOrderTccStatusNotExecuted() {
         when(distributedCacheService.inSet(TRY_KEY, TX_ID)).thenReturn(false);
         when(distributedCacheService.inSet(CONFIRM_KEY, TX_ID)).thenReturn(false);
@@ -120,4 +147,5 @@ class SeckillPlaceOrderServiceImplTest {
         goodsDTO.setStatus(SeckillGoodsStatusEnum.ONLINE.getCode());
         return goodsDTO;
     }
+
 }

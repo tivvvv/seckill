@@ -49,14 +49,15 @@ public class SeckillPlaceOrderBaseServiceImpl {
 
     @Transactional(rollbackFor = Exception.class)
     public Long cancelMethod(Long userId, SeckillOrderCommand seckillOrderCommand, Long txId) {
-        if (!distributedCacheService.inSet(Constants.getKey(Constants.ORDER_TRY_KEY_PREFIX, Constants.ORDER), txId)) {
-            log.warn("cancelMethod|提交订单cancel方法执行失败|{}", txId);
-            return txId;
-        }
-
+        String tryKey = Constants.getKey(Constants.ORDER_TRY_KEY_PREFIX, Constants.ORDER);
         String cancelKey = Constants.getKey(Constants.ORDER_CANCEL_KEY_PREFIX, Constants.ORDER);
         if (distributedCacheService.inSet(cancelKey, txId)) {
             log.warn("cancelMethod|提交订单cancel方法已执行过|{}", txId);
+            return txId;
+        }
+        if (!distributedCacheService.inSet(tryKey, txId)) {
+            log.warn("cancelMethod|提交订单空回滚|{}", txId);
+            distributedCacheService.addSet(cancelKey, txId);
             return txId;
         }
 
