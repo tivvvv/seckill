@@ -77,6 +77,7 @@ dubbo:
   protocol:
     name: dubbo
     port: 20881
+    serialization: fastjson2
 
 order:
   place:

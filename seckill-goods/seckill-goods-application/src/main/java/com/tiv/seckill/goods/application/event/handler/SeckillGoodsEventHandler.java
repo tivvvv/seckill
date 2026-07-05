@@ -3,7 +3,7 @@ package com.tiv.seckill.goods.application.event.handler;
 import com.alibaba.cola.dto.Response;
 import com.alibaba.cola.event.EventHandler;
 import com.alibaba.cola.event.EventHandlerI;
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson2.JSON;
 import com.tiv.seckill.goods.application.cache.service.SeckillGoodsCacheService;
 import com.tiv.seckill.goods.application.cache.service.SeckillGoodsListCacheService;
 import com.tiv.seckill.goods.domain.event.SeckillGoodsEvent;

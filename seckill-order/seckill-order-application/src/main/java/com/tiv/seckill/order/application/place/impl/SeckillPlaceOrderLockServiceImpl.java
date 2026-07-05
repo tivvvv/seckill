@@ -1,6 +1,6 @@
 package com.tiv.seckill.order.application.place.impl;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSON;
 import com.tiv.seckill.common.constants.Constants;
 import com.tiv.seckill.common.exception.BusinessException;
 import com.tiv.seckill.common.exception.ErrorCodeEnum;
@@ -88,9 +88,9 @@ public class SeckillPlaceOrderLockServiceImpl extends SeckillPlaceOrderBaseServi
                 distributedCacheService.removeSet(tryKey, txId);
             }
             if (e instanceof InterruptedException) {
-                log.error("SeckillPlaceOrderLockServiceImpl--placeOrder|分布式锁被中断|参数:{}", JSONObject.toJSONString(seckillOrderCommand), e);
+                log.error("SeckillPlaceOrderLockServiceImpl--placeOrder|分布式锁被中断|参数:{}", JSON.toJSONString(seckillOrderCommand), e);
             } else {
-                log.error("SeckillPlaceOrderLockServiceImpl--placeOrder|下单失败|参数:{}", JSONObject.toJSONString(seckillOrderCommand), e);
+                log.error("SeckillPlaceOrderLockServiceImpl--placeOrder|下单失败|参数:{}", JSON.toJSONString(seckillOrderCommand), e);
             }
             throw new BusinessException(ErrorCodeEnum.SYSTEM_ERROR, e.getMessage());
         } finally {

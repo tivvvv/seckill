@@ -1,8 +1,8 @@
 
 package com.tiv.seckill.common.builder;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.TypeReference;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.TypeReference;
 import com.tiv.seckill.common.cache.model.SeckillBusinessCache;
 
 import java.util.List;

@@ -31,7 +31,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring-boot.version>2.7.14</spring-boot.version>
         <spring-cloud-alibaba.version>2.2.2.RELEASE</spring-cloud-alibaba.version>
-        <fastjson.version>1.2.72</fastjson.version>
+        <fastjson.version>1.2.83</fastjson.version>
+        <fastjson2.version>2.0.52</fastjson2.version>
         <rocketmq.version>2.2.1</rocketmq.version>
         <guava.version>31.1-jre</guava.version>
         <commons-lang3.version>3.12.0</commons-lang3.version>
@@ -48,7 +49,7 @@
         <jwt.version>3.4.0</jwt.version>
         <redisson.version>3.24.2</redisson.version>
         <cola.version>3.0.0</cola.version>
-        <dubbo3.version>3.0.7</dubbo3.version>
+        <dubbo3.version>3.2.19</dubbo3.version>
         <hmily.version>2.1.2</hmily.version>
         <knife4j.version>4.5.0</knife4j.version>
     </properties>
@@ -77,6 +78,18 @@
                 <artifactId>dubbo-registry-nacos</artifactId>
                 <version>${dubbo3.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.apache.dubbo</groupId>
+                <artifactId>dubbo-serialization-fastjson2</artifactId>
+                <version>${dubbo3.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -99,9 +112,9 @@
         </dependency>
 
         <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-            <version>${fastjson.version}</version>
+            <groupId>com.alibaba.fastjson2</groupId>
+            <artifactId>fastjson2</artifactId>
+            <version>${fastjson2.version}</version>
         </dependency>
 
         <dependency>

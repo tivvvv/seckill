@@ -1,6 +1,6 @@
 package com.tiv.seckill.common.cache.distributed.redis;
 
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson2.JSON;
 import com.tiv.seckill.common.cache.distributed.DistributedCacheService;
 import com.tiv.seckill.common.constants.Constants;
 import com.tiv.seckill.common.exception.BusinessException;

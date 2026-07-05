@@ -1,6 +1,6 @@
 package com.tiv.seckill.goods.application.cache.service.impl;
 
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson2.JSON;
 import com.tiv.seckill.common.cache.distributed.DistributedCacheService;
 import com.tiv.seckill.common.cache.local.LocalCacheService;
 import com.tiv.seckill.common.cache.model.SeckillBusinessCache;

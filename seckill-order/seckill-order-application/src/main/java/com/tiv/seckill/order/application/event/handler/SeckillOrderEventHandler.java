@@ -3,7 +3,7 @@ package com.tiv.seckill.order.application.event.handler;
 import com.alibaba.cola.dto.Response;
 import com.alibaba.cola.event.EventHandler;
 import com.alibaba.cola.event.EventHandlerI;
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson2.JSON;
 import com.tiv.seckill.order.domain.event.SeckillOrderEvent;
 import lombok.extern.slf4j.Slf4j;
 
