@@ -78,7 +78,9 @@ public class SeckillPlaceOrderLockServiceImpl extends SeckillPlaceOrderBaseServi
             distributedCacheService.addSet(tryKey, txId);
             isTryRecorded = true;
             // 扣减数据库库存
-            seckillGoodsDubboService.decreaseAvailableStock(seckillOrderCommand.getGoodsId(), seckillOrderCommand.getQuantity(), txId);
+            if (!seckillGoodsDubboService.decreaseAvailableStock(seckillOrderCommand.getGoodsId(), seckillOrderCommand.getQuantity(), txId)) {
+                throw new BusinessException(ErrorCodeEnum.FORBIDDEN_ERROR, "库存不足");
+            }
             return seckillOrder.getId();
         } catch (Exception e) {
             if (isDecrementCachedStock) {
