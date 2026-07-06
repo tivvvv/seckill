@@ -70,9 +70,9 @@ dubbo:
     name: ${spring.application.name}
     metadata-type: remote
   metadata-report:
-    address: nacos://localhost:18375?namespace=34919eac-e874-4143-9ca4-88d475347c00
+    address: nacos://localhost:18375?namespace=seckill
   registry:
-    address: nacos://localhost:18375?namespace=34919eac-e874-4143-9ca4-88d475347c00&register-consumer-url=true
+    address: nacos://localhost:18375?namespace=seckill&register-consumer-url=true
     register-mode: all
   protocol:
     name: dubbo
