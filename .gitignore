@@ -39,3 +39,6 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+### Local Docker runtime ###
+docker/seata/logs/
